@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: sp
+    env: docker
+    plan: free
+    repo: https://github.com/shanwinder/sp
+    dockerfilePath: Dockerfile
