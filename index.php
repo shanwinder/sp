@@ -211,7 +211,7 @@
     <div class="star-bg"></div>
 
     <div class="welcome-box">
-        <img src="assets/img/kid_icon.png" alt="การ์ตูนเด็ก" class="character-img"/>
+        <img src="assets/img/kid_icon.png" alt="การ์ตูนเด็ก" class="character-img" />
 
         <!-- อีโมจิลอยหมุน -->
         <div class="emoji-fly emoji1">🌈</div>
