@@ -5,13 +5,16 @@ require_once '../includes/auth.php';
 requireAdmin();
 
 // ดึงข้อมูลนักเรียนทั้งหมด
-$sql = "SELECT student_id, name, class_level, created_at FROM users WHERE role = 'student' ORDER BY class_level, name";
+$sql = "SELECT id, student_id, name, class_level, created_at FROM users WHERE role = 'student' ORDER BY class_level, name";
 $result = $conn->query($sql);
 ?>
 
 <h1>แดชบอร์ดผู้ดูแลระบบ</h1>
 
-<p><a href="import_students.php" class="btn btn-primary btn-sm">+ นำเข้านักเรียน</a></p>
+<p>
+  <a href="add_user.php" class="btn btn-success btn-sm">+ เพิ่มนักเรียน</a>
+  <a href="import_students.php" class="btn btn-primary btn-sm">+ นำเข้านักเรียน</a>
+</p>
 
 <div class="table-responsive">
   <table class="table table-bordered table-hover">
@@ -22,6 +25,7 @@ $result = $conn->query($sql);
         <th>ชื่อ</th>
         <th>ชั้นเรียน</th>
         <th>วันที่สมัคร</th>
+        <th>การจัดการ</th>
       </tr>
     </thead>
     <tbody>
@@ -35,11 +39,15 @@ $result = $conn->query($sql);
                   <td>{$row['name']}</td>
                   <td>{$row['class_level']}</td>
                   <td>" . date('d/m/Y', strtotime($row['created_at'])) . "</td>
+                  <td>
+                    <a href='edit_user.php?id={$row['id']}' class='btn btn-warning btn-sm'>แก้ไข</a>
+                    <a href='delete_user.php?id={$row['id']}' class='btn btn-danger btn-sm' onclick=\"return confirm('คุณแน่ใจหรือไม่ที่จะลบผู้ใช้คนนี้?');\">ลบ</a>
+                  </td>
                 </tr>";
           $index++;
         }
       } else {
-        echo "<tr><td colspan='5' class='text-center'>ไม่มีข้อมูลนักเรียน</td></tr>";
+        echo "<tr><td colspan='6' class='text-center'>ไม่มีข้อมูลนักเรียน</td></tr>";
       }
       ?>
     </tbody>

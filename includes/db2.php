@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db   = 'learning_game'; // ให้ชื่อฐานข้อมูลตรงกับของคุณ
+$host = 'sql303.infinityfree.com';
+$user = 'if0_39235101';
+$pass = 'PDj2O0OWiJPYEm';
+$db   = 'if0_39235101_learning_game'; // ให้ชื่อฐานข้อมูลตรงกับของคุณ
 
 $conn = new mysqli($host, $user, $pass, $db);
 
