@@ -14,19 +14,20 @@
         body {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(to bottom right, #a1c4fd, #c2e9fb, #fddde6);
-            overflow: hidden;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 40px;
+            justify-content: center;
+            padding: 100px 20px 20px;
+            margin: 0;
             text-align: center;
+            overflow-x: hidden;
         }
 
 
-        /* พื้นหลังดวงดาว */
         .star-bg {
-            position: absolute;
+            position: fixed;
             width: 200%;
             height: 200%;
             background: radial-gradient(rgba(255, 255, 255, 0.9) 2px, transparent 2px),
@@ -37,7 +38,6 @@
             z-index: -1;
             opacity: 0.4;
         }
-
 
         @keyframes stars {
             from {
@@ -51,7 +51,7 @@
 
         .welcome-box {
             background: #fff9f0;
-            padding: 50px 40px;
+            padding: 40px 30px;
             border-radius: 24px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             max-width: 700px;
@@ -64,7 +64,7 @@
         .welcome-box h1 {
             color: #ff6f61;
             margin-bottom: 15px;
-            font-size: 3rem;
+            font-size: 2.5rem;
             animation: bounceIn 1s ease;
         }
 
@@ -96,7 +96,7 @@
             position: absolute;
             top: -60px;
             left: -40px;
-            width: 130px;
+            width: 100px;
             transform: rotate(-10deg);
             animation: floatY 3s ease-in-out infinite;
         }
@@ -116,16 +116,14 @@
         }
 
         @keyframes pulse {
-            0% {
+
+            0%,
+            100% {
                 transform: scale(1);
             }
 
             50% {
                 transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
             }
         }
 
@@ -157,7 +155,6 @@
             }
         }
 
-        /* อีโมจิลอยหมุน */
         .emoji-fly {
             position: absolute;
             font-size: 2rem;
@@ -203,6 +200,42 @@
             left: 50%;
             animation-delay: 4s;
         }
+
+        footer {
+            width: 100%;
+            margin-top: auto;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .footer-box {
+            background: rgba(255, 255, 255, 0.75);
+            margin: auto;
+            padding: 15px 10px;
+            border-radius: 15px;
+            max-width: 800px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-box h1 {
+                font-size: 2rem;
+                margin-top: 40px;
+            }
+
+            .welcome-box p {
+                font-size: 1rem;
+            }
+
+            .btn-login {
+                font-size: 1rem;
+                padding: 12px 24px;
+            }
+
+            .footer-box {
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 
@@ -230,16 +263,21 @@
         </div>
     </div>
 
-    <!-- เสียงต้อนรับ -->
     <audio autoplay>
         <source src="assets/sound/welcome.mp3" type="audio/mpeg">
     </audio>
-<!-- Footer -->
-    <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center;">
-        <div style="background: rgba(255, 255, 255, 0.7); margin: auto; padding: 15px 10px; border-radius: 15px; max-width: 1000px; font-size: 0.9rem;">
-            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์   </strong>ครู โรงเรียนบ้านนาอุดม<br>สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-box">
+            <p class="mb-1">
+                พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
+                ครู โรงเรียนบ้านนาอุดม<br>
+                สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร
             </p>
-            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai, Ban Na Udom School, under Mukdahan Primary Educational Service Area Office. All rights reserved.</p>
+            <p class="text-muted mb-0">
+                &copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai. All rights reserved.
+            </p>
         </div>
     </footer>
 </body>

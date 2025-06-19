@@ -37,13 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 
 <head>
     <meta charset="UTF-8">
     <title>เข้าสู่ระบบ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
     <style>
@@ -51,14 +51,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(to bottom right, #a1c4fd, #c2e9fb, #fddde6);
             min-height: 100vh;
-            overflow: hidden;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
+            justify-content: space-between;
+            margin: 0;
         }
 
+        html,
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            /* ป้องกันการเลื่อนแนวนอน */
+        }
+
+        .emoji-fly {
+            position: fixed;
+            /* เดิม: absolute */
+            font-size: 2rem;
+            animation: flyRotate 10s linear infinite;
+            opacity: 0.8;
+            max-width: 100vw;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+
+
         .star-bg {
-            position: absolute;
+            position: fixed;
             width: 200%;
             height: 200%;
             background: radial-gradient(rgba(255, 255, 255, 0.9) 2px, transparent 2px),
@@ -78,6 +98,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             to {
                 transform: translateY(-500px);
             }
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
         }
 
         .login-box {
@@ -118,23 +147,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         @keyframes flyRotate {
             0% {
-                transform: translate(0px, 0px) rotate(0deg);
+                transform: translate(0, 0) rotate(0deg);
             }
 
             25% {
-                transform: translate(120px, -160px) rotate(90deg);
+                transform: translate(40px, -60px) rotate(90deg);
             }
 
             50% {
-                transform: translate(240px, 0px) rotate(180deg);
+                transform: translate(80px, 0px) rotate(180deg);
             }
 
             75% {
-                transform: translate(120px, 160px) rotate(270deg);
+                transform: translate(40px, 60px) rotate(270deg);
             }
 
             100% {
-                transform: translate(0px, 0px) rotate(360deg);
+                transform: translate(0, 0) rotate(360deg);
             }
         }
 
@@ -159,45 +188,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             animation-delay: 4s;
             z-index: 2;
         }
+
+        footer {
+            text-align: center;
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.75);
+        }
+
+        footer div {
+            max-width: 1000px;
+            margin: auto;
+            font-size: 0.9rem;
+            border-radius: 15px;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="star-bg"></div>
-
-    <!-- อีโมจิ -->
     <div class="emoji-fly emoji1">🌈</div>
     <div class="emoji-fly emoji2">🪐</div>
     <div class="emoji-fly emoji3">✨</div>
 
-    <div class="login-box">
-        <h2>เข้าสู่ระบบ</h2>
+    <main>
+        <div class="login-box">
+            <h2>เข้าสู่ระบบ</h2>
 
-        <?php if (!empty($message)): ?>
-            <div class="alert alert-warning text-center"><?php echo $message; ?></div>
-        <?php endif; ?>
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-warning text-center"><?php echo $message; ?></div>
+            <?php endif; ?>
 
-        <form method="post">
-            <div class="mb-3">
-                <label for="username" class="form-label">ชื่อผู้ใช้ (รหัสนักเรียน)</label>
-                <input type="text" class="form-control" name="username" id="username" required autofocus>
-            </div>
+            <form method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">ชื่อผู้ใช้ (รหัสนักเรียน)</label>
+                    <input type="text" class="form-control" name="username" id="username" required autofocus>
+                </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">รหัสผ่าน</label>
-                <input type="password" class="form-control" name="password" id="password" required>
-            </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">รหัสผ่าน</label>
+                    <input type="password" class="form-control" name="password" id="password" required>
+                </div>
 
-            <button type="submit" class="btn btn-primary w-100">🎮 เข้าสู่ระบบ</button>
-        </form>
-    </div>
-    <!-- Footer -->
-    <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center;">
-        <div style="background: rgba(255, 255, 255, 0.75); margin: auto; padding: 15px 10px; border-radius: 15px; max-width: 1000px; font-size: 0.9rem;">
-            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์   </strong>ครู โรงเรียนบ้านนาอุดม<br>สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร
-            </p>
-            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai, Ban Na Udom School, under Mukdahan Primary Educational Service Area Office. All rights reserved.</p>
+                <button type="submit" class="btn btn-primary w-100">🎮 เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div>
+            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
+                ครู โรงเรียนบ้านนาอุดม<br>
+                สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร</p>
+            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai. All rights reserved.</p>
         </div>
     </footer>
 
