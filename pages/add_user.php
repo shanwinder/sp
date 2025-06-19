@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <a href="dashboard.php" class="btn btn-secondary mb-3">← กลับไปยังแดชบอร์ด</a>
     <form method="post">
         <div class="mb-3">
-            <label for="student_id" class="form-label">บัญชีผู้ใช้</label>
+            <label for="student_id" class="form-label">ชื่อบัญชี</label>
             <input type="text" class="form-control" name="student_id" id="student_id" required>
         </div>
 

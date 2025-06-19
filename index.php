@@ -237,12 +237,9 @@
 <!-- Footer -->
     <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center;">
         <div style="background: rgba(255, 255, 255, 0.7); margin: auto; padding: 15px 10px; border-radius: 15px; max-width: 1000px; font-size: 0.9rem;">
-            <p class="mb-1">พัฒนาระบบโดย<br>
-                <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
-                ครู โรงเรียนบ้านนาอุดม<br>
-                สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร
+            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์   </strong>ครู โรงเรียนบ้านนาอุดม<br>สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร
             </p>
-            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwantrai, Ban Na Udom School, under Mukdahan Primary Educational Service Area Office. All rights reserved.</p>
+            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai, Ban Na Udom School, under Mukdahan Primary Educational Service Area Office. All rights reserved.</p>
         </div>
     </footer>
 </body>
