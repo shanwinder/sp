@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST["name"]);
     $password = trim($_POST["password"]);
 
-    // ตรวจสอบว่าชื่อผู้ใช้นี้มีอยู่แล้วหรือไม่
+    // ตรวจสอบว่ามีชื่อผู้ใช้อยู่ในระบบหรือยัง
     $stmt = $conn->prepare("SELECT id FROM users WHERE student_id = ?");
     $stmt->bind_param("s", $admin_id);
     $stmt->execute();
@@ -19,9 +19,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->num_rows > 0) {
         $error = "❌ มีชื่อผู้ใช้นี้อยู่ในระบบแล้ว";
     } else {
-        // บันทึกข้อมูลแอดมิน
+        $stmt->close();
+
+        // สร้างบัญชี admin โดยกำหนด class_level เป็น NULL
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO users (student_id, name, password, role) VALUES (?, ?, ?, 'admin')");
+        $stmt = $conn->prepare("INSERT INTO users (student_id, name, class_level, password, role) VALUES (?, ?, NULL, ?, 'admin')");
         $stmt->bind_param("sss", $admin_id, $name, $hashed_password);
 
         if ($stmt->execute()) {
@@ -30,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "❌ ไม่สามารถสร้างผู้ดูแลได้: " . $stmt->error;
         }
     }
+
     $stmt->close();
 }
 ?>

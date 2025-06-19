@@ -96,7 +96,7 @@
             position: absolute;
             top: -60px;
             left: -40px;
-            width: 200px;
+            width: 130px;
             transform: rotate(-10deg);
             animation: floatY 3s ease-in-out infinite;
         }
@@ -211,7 +211,7 @@
     <div class="star-bg"></div>
 
     <div class="welcome-box">
-        <img src="assets/img/kid.png" alt="การ์ตูนเด็ก" class="character-img" />
+        <img src="assets/img/kid.webp" alt="การ์ตูนเด็ก" class="character-img" />
 
         <!-- อีโมจิลอยหมุน -->
         <div class="emoji-fly emoji1">🌈</div>
@@ -234,7 +234,17 @@
     <audio autoplay>
         <source src="assets/sound/welcome.mp3" type="audio/mpeg">
     </audio>
-
+<!-- Footer -->
+    <footer style="position: absolute; bottom: 10px; width: 100%; text-align: center;">
+        <div style="background: rgba(255, 255, 255, 0.7); margin: auto; padding: 15px 10px; border-radius: 15px; max-width: 1000px; font-size: 0.9rem;">
+            <p class="mb-1">พัฒนาระบบโดย<br>
+                <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
+                ครู โรงเรียนบ้านนาอุดม<br>
+                สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร
+            </p>
+            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwantrai, Ban Na Udom School, under Mukdahan Primary Educational Service Area Office. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 
 </html>
