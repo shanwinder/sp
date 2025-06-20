@@ -1,5 +1,16 @@
+<?php
+session_start();
+require_once '../includes/db.php';
+require_once '../includes/auth.php';
+
+$user_id = $_SESSION['user_id'];
+$stage_id = 1; // ด่านที่ 1 ของเกม Logic
+?>
+
+
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <title>เกมลำดับภาพสัตว์ - ด่านที่ 1</title>
@@ -12,17 +23,20 @@
       padding: 20px;
       text-align: center;
     }
+
     h1 {
       font-size: 48px;
       color: #ff6b81;
       margin-bottom: 20px;
       text-shadow: 1px 1px #fff;
     }
+
     p.lead {
       font-size: 24px;
       color: #333;
       margin-bottom: 40px;
     }
+
     .sequence {
       display: flex;
       justify-content: center;
@@ -30,18 +44,22 @@
       margin-bottom: 30px;
       flex-wrap: wrap;
     }
+
     .choices {
       display: flex;
       justify-content: center;
       gap: 30px;
       margin-top: 30px;
     }
-    .animal, .drop-target {
+
+    .animal,
+    .drop-target {
       width: 120px;
       height: 120px;
       border-radius: 16px;
       transition: transform 0.3s ease;
     }
+
     .drop-target {
       border: 3px dashed #ccc;
       background-color: #fff;
@@ -49,13 +67,16 @@
       align-items: center;
       justify-content: center;
     }
+
     .drag-item {
       cursor: grab;
     }
+
     .drag-item:hover {
       transform: scale(1.1);
       animation: bounce 0.6s;
     }
+
     button {
       margin-top: 30px;
       padding: 12px 30px;
@@ -66,16 +87,26 @@
       border-radius: 12px;
       cursor: pointer;
     }
+
     @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
     }
+
     .dragging {
       transform: scale(1.2) rotate(3deg);
       transition: transform 0.2s ease;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
       opacity: 0.9;
     }
+
     .ghost-follow {
       position: absolute;
       width: 120px;
@@ -84,13 +115,29 @@
       z-index: 1000;
       animation: wiggle 0.6s infinite ease-in-out;
     }
+
     @keyframes wiggle {
-      0%   { transform: scale(1.2) rotate(5deg); }
-      25%  { transform: scale(1.2) rotate(8deg); }
-      50%  { transform: scale(1.2) rotate(3deg); }
-      75%  { transform: scale(1.2) rotate(7deg); }
-      100% { transform: scale(1.2) rotate(5deg); }
+      0% {
+        transform: scale(1.2) rotate(5deg);
+      }
+
+      25% {
+        transform: scale(1.2) rotate(8deg);
+      }
+
+      50% {
+        transform: scale(1.2) rotate(3deg);
+      }
+
+      75% {
+        transform: scale(1.2) rotate(7deg);
+      }
+
+      100% {
+        transform: scale(1.2) rotate(5deg);
+      }
     }
+
     .back-btn {
       position: fixed;
       top: 20px;
@@ -104,12 +151,48 @@
       cursor: pointer;
       text-decoration: none;
     }
+
     .back-btn:hover {
       background-color: #2563eb;
     }
   </style>
 </head>
+
 <body>
+  <?php
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $score = (int) $_POST['score']; // 0 หรือ จำนวนที่ตอบถูก
+    $completed_at = ($score === 2) ? date('Y-m-d H:i:s') : null;
+
+    // บันทึกหรืออัปเดตใน progress
+    $stmt = $conn->prepare("INSERT INTO progress (user_id, stage_id, score, attempts, completed_at)
+        VALUES (?, ?, ?, 1, ?)
+        ON DUPLICATE KEY UPDATE
+        score = VALUES(score),
+        attempts = attempts + 1,
+        completed_at = VALUES(completed_at)");
+    $stmt->bind_param("iiis", $user_id, $stage_id, $score, $completed_at);
+    $stmt->execute();
+    $stmt->close();
+
+    // บันทึก log
+    $action = ($score === 2) ? 'pass' : 'fail';
+    $detail = json_encode(['score' => $score]);
+    $stmt = $conn->prepare("INSERT INTO game_logs (user_id, stage_id, action, detail) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("iiss", $user_id, $stage_id, $action, $detail);
+    $stmt->execute();
+    $stmt->close();
+
+    echo "<script>localStorage.setItem('stage_completed', '1');</script>";
+  }
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // ... code บันทึก ...
+    echo "<script>window.location.href = window.location.href;</script>";
+    exit;
+  }
+
+  ?>
+
   <a href="student_dashboard.php" class="back-btn">&larr; กลับสู่หน้าแดชบอร์ด</a>
   <h1>เกมลำดับภาพสัตว์ - ด่านที่ 1</h1>
 
@@ -211,12 +294,31 @@
         result.textContent = "🎉 เก่งมาก! ตอบถูกทั้งหมด";
         result.style.color = "green";
         correctSound.play();
+        sendResult(correct); // ✅ เพิ่มบรรทัดนี้
       } else {
         result.textContent = `❌ ตอบถูก ${correct}/${targets.length} ลองอีกครั้งนะ`;
         result.style.color = "red";
         wrongSound.play();
+        sendResult(correct); // ✅ เพิ่มบรรทัดนี้
       }
     }
+
+    function sendResult(score) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'score';
+      input.value = score;
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
   </script>
+
 </body>
+
 </html>
