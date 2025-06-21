@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once '../includes/db.php';
 require_once '../includes/auth.php';
+require_once '../includes/db.php';
 
 $user_id = $_SESSION['user_id'];
-$stage_id = 1; // ด่านที่ 1 ของเกม Logic
+$stage_id = 1;
 ?>
 
 
@@ -12,313 +12,136 @@ $stage_id = 1; // ด่านที่ 1 ของเกม Logic
 <html lang="th">
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>เกมลำดับภาพสัตว์ - ด่านที่ 1</title>
-  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <script>
+    const USER_ID = <?= $user_id ?>;
+    const STAGE_ID = <?= $stage_id ?>;
+    const USER_NAME = "<?= $_SESSION['name'] ?>";
+  </script>
+  <script src="../assets/js/logic_game/stage1.js"></script>
   <style>
     body {
       font-family: 'Kanit', sans-serif;
       background: linear-gradient(to right, #fef3c7, #bae6fd);
-      padding: 20px;
-      text-align: center;
+      margin: 0;
     }
 
-    h1 {
-      font-size: 48px;
-      color: #ff6b81;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px #fff;
-    }
-
-    p.lead {
-      font-size: 24px;
-      color: #333;
-      margin-bottom: 40px;
-    }
-
-    .sequence {
+    #top-bar {
+      background-color: #fde68a;
+      padding: 10px 20px;
       display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-
-    .choices {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-top: 30px;
-    }
-
-    .animal,
-    .drop-target {
-      width: 120px;
-      height: 120px;
-      border-radius: 16px;
-      transition: transform 0.3s ease;
-    }
-
-    .drop-target {
-      border: 3px dashed #ccc;
-      background-color: #fff;
-      display: flex;
+      justify-content: space-between;
       align-items: center;
+    }
+
+    #game-wrapper {
+      flex: 1;
+      display: flex;
       justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
-    .drag-item {
-      cursor: grab;
+    #game-container {
+      width: 100%;
+      max-width: 900px;
+      aspect-ratio: 3 / 2;
+      background-color: #fff3cd;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
     }
 
-    .drag-item:hover {
-      transform: scale(1.1);
-      animation: bounce 0.6s;
+
+    .btn-nav {
+      margin-left: 10px;
     }
 
-    button {
-      margin-top: 30px;
-      padding: 12px 30px;
-      font-size: 20px;
-      background-color: #f59e0b;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
+    @media (max-width: 576px) {
+      #top-bar {
+        font-size: 0.9rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
       }
 
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    .dragging {
-      transform: scale(1.2) rotate(3deg);
-      transition: transform 0.2s ease;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      opacity: 0.9;
-    }
-
-    .ghost-follow {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      pointer-events: none;
-      z-index: 1000;
-      animation: wiggle 0.6s infinite ease-in-out;
-    }
-
-    @keyframes wiggle {
-      0% {
-        transform: scale(1.2) rotate(5deg);
-      }
-
-      25% {
-        transform: scale(1.2) rotate(8deg);
-      }
-
-      50% {
-        transform: scale(1.2) rotate(3deg);
-      }
-
-      75% {
-        transform: scale(1.2) rotate(7deg);
-      }
-
-      100% {
-        transform: scale(1.2) rotate(5deg);
+      #game-container {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 3 / 2;
       }
     }
 
-    .back-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      font-size: 1rem;
-      background-color: #3b82f6;
-      color: #fff;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      text-decoration: none;
+    footer {
+      text-align: center;
+      padding: 15px 10px;
+      background: rgba(255, 255, 255, 0.75);
     }
 
-    .back-btn:hover {
-      background-color: #2563eb;
+    footer div {
+      max-width: 1000px;
+      margin: auto;
+      font-size: 0.9rem;
+      border-radius: 15px;
     }
   </style>
 </head>
 
 <body>
-  <?php
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $score = (int) $_POST['score']; // 0 หรือ จำนวนที่ตอบถูก
-    $completed_at = ($score === 2) ? date('Y-m-d H:i:s') : null;
 
-    // บันทึกหรืออัปเดตใน progress
-    $stmt = $conn->prepare("INSERT INTO progress (user_id, stage_id, score, attempts, completed_at)
-        VALUES (?, ?, ?, 1, ?)
-        ON DUPLICATE KEY UPDATE
-        score = VALUES(score),
-        attempts = attempts + 1,
-        completed_at = VALUES(completed_at)");
-    $stmt->bind_param("iiis", $user_id, $stage_id, $score, $completed_at);
-    $stmt->execute();
-    $stmt->close();
-
-    // บันทึก log
-    $action = ($score === 2) ? 'pass' : 'fail';
-    $detail = json_encode(['score' => $score]);
-    $stmt = $conn->prepare("INSERT INTO game_logs (user_id, stage_id, action, detail) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("iiss", $user_id, $stage_id, $action, $detail);
-    $stmt->execute();
-    $stmt->close();
-
-    echo "<script>localStorage.setItem('stage_completed', '1');</script>";
-  }
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // ... code บันทึก ...
-    echo "<script>window.location.href = window.location.href;</script>";
-    exit;
-  }
-
-  ?>
-
-  <a href="student_dashboard.php" class="back-btn">&larr; กลับสู่หน้าแดชบอร์ด</a>
-  <h1>เกมลำดับภาพสัตว์ - ด่านที่ 1</h1>
-
-  <div class="sequence">
-    <img src="../assets/img/dog.webp" class="animal">
-    <img src="../assets/img/cat.webp" class="animal">
-    <div class="drop-target" data-answer="rabbit"></div>
-    <img src="../assets/img/dog.webp" class="animal">
-    <div class="drop-target" data-answer="cat"></div>
-    <img src="../assets/img/rabbit.webp" class="animal">
-  </div>
-  <p class="lead">ลากสัตว์ที่ถูกต้องมาวางในช่องว่างให้ครบ</p>
-  <div class="choices">
-    <img src="../assets/img/rabbit.webp" class="drag-item animal" draggable="true" data-name="rabbit">
-    <img src="../assets/img/cat.webp" class="drag-item animal" draggable="true" data-name="cat">
-    <img src="../assets/img/dog.webp" class="drag-item animal" draggable="true" data-name="dog">
+  <!-- แถบด้านบน -->
+  <div id="top-bar">
+    <div>
+      👦 ผู้เล่น: <strong><?= $_SESSION['name'] ?></strong> |
+      🧩 เกม: <strong>ลำดับภาพสัตว์</strong> |
+      🧠 ด่านที่: <strong>1</strong> |
+      🌟 คะแนนรวม: <strong id="total-score">--</strong>
+    </div>
+    <div>
+      <a href="student_dashboard.php" class="btn btn-primary btn-sm">กลับแดชบอร์ด</a>
+      <a href="stage_logic_2.php" button id="nextStageBtn" class="btn btn-success btn-sm" style="display: none;">ไปด่านถัดไป ▶️</a>
+    </div>
   </div>
 
-  <audio id="correctSound" src="../assets/sound/correct.mp3"></audio>
-  <audio id="wrongSound" src="../assets/sound/wrong.mp3"></audio>
+  <!-- พื้นที่เกม -->
+  <div id="game-wrapper">
+    <div id="game-container" style="margin: auto; width: 900px; height: 600px;"></div>
+  </div>
+  <!-- พื้นที่แจ้งเตือน -->
+  <div id="feedback-popup" style="
+  display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%);
+  background:#fff8dc; border:3px solid #facc15; padding:30px; border-radius:16px;
+  font-size:28px; text-align:center; box-shadow:0 10px 20px rgba(0,0,0,0.2); z-index:999;
+  animation: popIn 0.6s ease;
+"></div>
 
-  <p id="result" style="font-size: 22px; margin-top: 30px;"></p>
+  <style>
+    @keyframes popIn {
+      0% {
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0;
+      }
 
-  <script>
-    const items = document.querySelectorAll('.drag-item');
-    const targets = document.querySelectorAll('.drop-target');
-    const result = document.getElementById('result');
-    const correctSound = document.getElementById('correctSound');
-    const wrongSound = document.getElementById('wrongSound');
-
-    let ghost = null;
-
-    items.forEach(item => {
-      item.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('animal', e.target.dataset.name);
-        e.dataTransfer.setData('src', e.target.src);
-        e.dataTransfer.setDragImage(new Image(), 0, 0);
-
-        item.classList.add('dragging');
-
-        ghost = document.createElement('img');
-        ghost.src = e.target.src;
-        ghost.className = 'ghost-follow';
-        document.body.appendChild(ghost);
-
-        document.addEventListener('dragover', onDragMove);
-      });
-
-      item.addEventListener('dragend', () => {
-        item.classList.remove('dragging');
-        if (ghost) {
-          ghost.remove();
-          ghost = null;
-        }
-        document.removeEventListener('dragover', onDragMove);
-      });
-    });
-
-    function onDragMove(e) {
-      if (ghost) {
-        ghost.style.left = `${e.pageX}px`;
-        ghost.style.top = `${e.pageY}px`;
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
       }
     }
+  </style>
 
-    targets.forEach(target => {
-      target.addEventListener('dragover', e => e.preventDefault());
-      target.addEventListener('drop', e => {
-        e.preventDefault();
-        const animal = e.dataTransfer.getData('animal');
-        const src = e.dataTransfer.getData('src');
-        target.innerHTML = `<img src="${src}" class="animal">`;
-        target.dataset.selected = animal;
-        checkAuto();
-      });
-    });
-
-    function checkAuto() {
-      let filled = true;
-      targets.forEach(t => {
-        if (!t.dataset.selected) {
-          filled = false;
-        }
-      });
-      if (filled) {
-        checkAnswers();
-      }
-    }
-
-    function checkAnswers() {
-      let correct = 0;
-      targets.forEach(t => {
-        if (t.dataset.selected === t.dataset.answer) {
-          correct++;
-        }
-      });
-
-      if (correct === targets.length) {
-        result.textContent = "🎉 เก่งมาก! ตอบถูกทั้งหมด";
-        result.style.color = "green";
-        correctSound.play();
-        sendResult(correct); // ✅ เพิ่มบรรทัดนี้
-      } else {
-        result.textContent = `❌ ตอบถูก ${correct}/${targets.length} ลองอีกครั้งนะ`;
-        result.style.color = "red";
-        wrongSound.play();
-        sendResult(correct); // ✅ เพิ่มบรรทัดนี้
-      }
-    }
-
-    function sendResult(score) {
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.style.display = 'none';
-
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'score';
-      input.value = score;
-      form.appendChild(input);
-
-      document.body.appendChild(form);
-      form.submit();
-    }
-  </script>
-
+  <footer>
+    <div>
+      <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
+        ครู โรงเรียนบ้านนาอุดม<br>
+        สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร</p>
+      <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 
 </html>
