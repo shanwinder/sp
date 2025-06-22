@@ -106,7 +106,7 @@ function getGameProgress($conn, $user_id, $game_id)
             height: 100%;
             background-repeat: repeat;
             background-size: 200% 200%;
-            opacity: 100;
+            /* opacity: 100; ค่านี้ไม่ได้มีผลเพราะถูกทับด้วย opacity ในแต่ละ layer- */
             animation: moveStars 120s linear infinite;
         }
 
@@ -114,39 +114,43 @@ function getGameProgress($conn, $user_id, $game_id)
         .star-layer::after {
             content: '';
             position: absolute;
-            width: 2px;
-            height: 2px;
+            /* เพิ่มขนาดดาวเป็น 3px ให้เห็นชัดขึ้น */
+            width: 3px;
+            height: 3px;
             background: white;
             border-radius: 50%;
             box-shadow:
-                100px 200px white,
-                150px 350px white,
-                200px 150px white,
-                50px 500px white,
-                300px 100px white,
-                400px 300px white,
-                250px 400px white,
-                600px 150px white,
-                500px 250px white;
+                /* เพิ่มจำนวนดาวและกระจายตำแหน่งให้มากขึ้น */
+                100px 200px white, 150px 350px white, 200px 150px white,
+                50px 500px white, 300px 100px white, 400px 300px white,
+                250px 400px white, 600px 150px white, 500px 250px white,
+                700px 50px white, 800px 450px white, 120px 600px white,
+                350px 70px white, 900px 200px white, 100px 800px white,
+                550px 550px white, 200px 700px white, 450px 120px white,
+                750px 650px white, 950px 350px white, 50px 250px white,
+                850px 100px white, 250px 900px white, 650px 400px white,
+                150px 50px white, 300px 850px white, 700px 700px white,
+                400px 20px white, 900px 500px white,
+                100px 100px white, 200px 600px white, 700px 900px white, 850px 50px white; /* เพิ่มดาวอีก */
             animation: twinkle 2s infinite ease-in-out alternate;
         }
 
         .star-layer.layer-1 {
             transform: translateZ(0);
-            animation-duration: 30s;
-            opacity: 0.5;
+            animation-duration: 60s;
+            opacity: 0.9; /* เพิ่มความชัดเจน */
         }
 
         .star-layer.layer-2 {
             transform: translateZ(-1px) scale(1.5);
-            animation-duration: 60s;
-            opacity: 0.2;
+            animation-duration: 120s;
+            opacity: 0.7; /* เพิ่มความชัดเจน */
         }
 
         .star-layer.layer-3 {
             transform: translateZ(-2px) scale(2);
-            animation-duration: 120s;
-            opacity: 0.1;
+            animation-duration: 180s;
+            opacity: 0.5; /* เพิ่มความชัดเจน */
         }
 
         @keyframes moveStars {
@@ -172,9 +176,6 @@ function getGameProgress($conn, $user_id, $game_id)
                 opacity: 0.2;
             }
         }
-
-
-
 
         .welcome {
             font-size: 1.6rem;
@@ -203,24 +204,30 @@ function getGameProgress($conn, $user_id, $game_id)
             overflow: hidden;
             cursor: pointer;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 4px solid rgba(255, 255, 255, 0.3);
             outline: 1px solid rgba(0, 0, 0, 0.15);
+            /* ใช้ animation สำหรับการโหลดครั้งแรกเท่านั้น */
             animation: slideUp 0.7s ease forwards;
-            transform: translateY(30px);
-            opacity: 0;
+            /* กำหนด transition สำหรับการ hover */
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+            transform-style: preserve-3d; /* สำหรับการหมุน 3D ในอนาคต (ถ้ามี) */
         }
 
         @keyframes slideUp {
-            to {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
                 transform: translateY(0);
                 opacity: 1;
             }
         }
 
         .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.3);
+            /* แอนิเมชันสำหรับ hover */
+            transform: translateY(-20px) rotate(-5deg) scale(1.08); /* เลื่อนขึ้น หมุนเล็กน้อย และขยาย */
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.4);
             border-color: #6a5acd;
             outline: 2px solid #6a5acd;
         }
@@ -309,6 +316,8 @@ function getGameProgress($conn, $user_id, $game_id)
             max-width: 800px;
             font-size: 0.9rem;
         }
+
+        /* ลบ @keyframes bounceInHover; ทิ้งไป เพราะไม่ได้ใช้แล้ว */
     </style>
 </head>
 
@@ -338,6 +347,7 @@ function getGameProgress($conn, $user_id, $game_id)
                 ?>
                 <a href="<?= $link ?>" class="game-card" style="background-image: url('<?= $bg ?>');"
                     title="<?= htmlspecialchars($game['title']) ?>">
+
                     <div class="game-overlay">
                         <div class="game-code"><?= htmlspecialchars($game['code']) ?></div>
                         <div class="progress-info">
