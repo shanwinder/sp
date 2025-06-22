@@ -72,6 +72,42 @@ function getGameProgress($conn, $user_id, $game_id)
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+            animation: fadeZoom 0.7s ease-in-out;
+        }
+
+        @keyframes fadeZoom {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .background-stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background-image: url('../assets/img/star-bg.svg');
+            background-size: cover;
+            background-repeat: repeat;
+            opacity: 0.07;
+            animation: floatBG 30s linear infinite;
+        }
+
+        @keyframes floatBG {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
         }
 
         .welcome {
@@ -103,9 +139,17 @@ function getGameProgress($conn, $user_id, $game_id)
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border: 4px solid rgba(255, 255, 255, 0.3);
-            /* ขอบเด่นขึ้น */
             outline: 1px solid rgba(0, 0, 0, 0.15);
-            /* ขอบรองซ้อน */
+            animation: slideUp 0.7s ease forwards;
+            transform: translateY(30px);
+            opacity: 0;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .game-card:hover {
@@ -123,7 +167,6 @@ function getGameProgress($conn, $user_id, $game_id)
             background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent 60%);
             color: #fff;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
-            /* เงาเพิ่มความคม */
             text-align: center;
         }
 
@@ -131,7 +174,6 @@ function getGameProgress($conn, $user_id, $game_id)
             font-size: 1.7rem;
             font-weight: bold;
             background-color: rgba(0, 0, 0, 0.5);
-            /* พื้นหลังตัวหนังสือ */
             padding: 4px 10px;
             border-radius: 12px;
             display: inline-block;
@@ -144,7 +186,6 @@ function getGameProgress($conn, $user_id, $game_id)
             padding: 6px 10px;
             border-radius: 10px;
         }
-
 
         .progress-bar {
             height: 14px;
@@ -186,45 +227,60 @@ function getGameProgress($conn, $user_id, $game_id)
                 height: 12px;
             }
         }
+                footer {
+            width: 100%;
+            margin-top: auto;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        .footer-box {
+            background: rgba(255, 255, 255, 0.75);
+            margin: auto;
+            padding: 15px 10px;
+            border-radius: 15px;
+            max-width: 800px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 
 <body>
+<div class="background-stars"></div>
 
-    <?php include '../includes/student_header.php'; ?>
+<?php include '../includes/student_header.php'; ?>
 
-    <main class="container my-4 d-flex flex-column align-items-center">
-        <div class="welcome">สวัสดี ยินดีต้อนรับ <?= htmlspecialchars($name) ?> 👋</div>
-        <div class="game-list" role="list" aria-label="รายการแบบฝึกหัดเกม">
-            <?php foreach ($games as $game_id => $game):
-                $progress = getGameProgress($conn, $user_id, $game_id);
-                $percent = ($progress['total'] > 0) ? round(($progress['passed'] / $progress['total']) * 100) : 0;
-                $bg = "../assets/img/cards/" . $game['code'] . ".png";
+<main class="container my-4 d-flex flex-column align-items-center">
+    <div class="welcome">สวัสดี ยินดีต้อนรับ <?= htmlspecialchars($name) ?> 👋</div>
+    <div class="game-list" role="list" aria-label="รายการแบบฝึกหัดเกม">
+        <?php foreach ($games as $game_id => $game):
+            $progress = getGameProgress($conn, $user_id, $game_id);
+            $percent = ($progress['total'] > 0) ? round(($progress['passed'] / $progress['total']) * 100) : 0;
+            $bg = "../assets/img/cards/" . $game['code'] . ".png";
 
-                // ปรับลิงก์เฉพาะเกมลำดับภาพสัตว์ (Logic)
-                if ($game_id == 1) {
-                    $link = "stage_logic_1.php";
-                } else {
-                    $link = "stage.php?game_id=$game_id&stage=1";
-                }
-            ?>
-                <a href="<?= $link ?>" class="game-card" style="background-image: url('<?= $bg ?>');" title="<?= htmlspecialchars($game['title']) ?>">
-                    <div class="game-overlay">
-                        <div class="game-code"><?= htmlspecialchars($game['code']) ?></div>
-                        <div class="progress-info">
-                            ด่านที่ทำสำเร็จ: <?= $progress['passed'] ?>/<?= $progress['total'] ?><br>
-                            คะแนนรวม: <?= $progress['score'] ?>
-                            <div class="progress-bar">
-                                <div class="progress-bar-fill" style="width: <?= $percent ?>%;"></div>
-                            </div>
+            if ($game_id == 1) {
+                $link = "stage_logic_1.php";
+            } else {
+                $link = "stage.php?game_id=$game_id&stage=1";
+            }
+        ?>
+            <a href="<?= $link ?>" class="game-card" style="background-image: url('<?= $bg ?>');" title="<?= htmlspecialchars($game['title']) ?>">
+                <div class="game-overlay">
+                    <div class="game-code"><?= htmlspecialchars($game['code']) ?></div>
+                    <div class="progress-info">
+                        ด่านที่ทำสำเร็จ: <?= $progress['passed'] ?>/<?= $progress['total'] ?><br>
+                        คะแนนรวม: <?= $progress['score'] ?>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: <?= $percent ?>%;"></div>
                         </div>
                     </div>
-                </a>
-            <?php endforeach; ?>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    </div>
+</main>
 
-        </div>
-    </main>
+<?php include '../includes/student_footer.php'; ?>
 
 </body>
-
 </html>

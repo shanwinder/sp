@@ -82,7 +82,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
                     <a class="nav-link" href="student_dashboard.php">🏠 หน้าแรก</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="student_progress.php">📈 ความก้าวหน้า</a>
+                    <a class="nav-link" href="student_learn.php">📖 ทบทวนบทเรียน</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่ไหม?')">🚪 ออกจากระบบ</a>

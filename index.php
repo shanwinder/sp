@@ -6,7 +6,6 @@
     <title>ยินดีต้อนรับ - ระบบแบบฝึกทักษะ ป.4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
 
@@ -23,6 +22,8 @@
             margin: 0;
             text-align: center;
             overflow-x: hidden;
+            /* เพิ่ม padding-bottom เพื่อไม่ให้เนื้อหาถูก footer บัง */
+            padding-bottom: 80px; /* กำหนดเผื่อความสูงของ footer */
         }
 
 
@@ -59,6 +60,8 @@
             border: 4px dashed #ffd166;
             position: relative;
             animation: fadeInUp 1s ease;
+            z-index: 1; /* ตรวจสอบให้แน่ใจว่าอยู่เหนือพื้นหลัง */
+            margin-bottom: 12rem;
         }
 
         .welcome-box h1 {
@@ -160,6 +163,7 @@
             font-size: 2rem;
             animation: flyRotate 10s linear infinite;
             opacity: 0.8;
+            z-index: 2; /* ให้อีโมจิอยู่เหนือกล่อง welcome */
         }
 
         @keyframes flyRotate {
@@ -201,21 +205,27 @@
             animation-delay: 4s;
         }
 
+        /* --- Footer Styles --- */
         footer {
+            position: fixed; /* เปลี่ยนเป็น fixed */
+            bottom: 0; /* ตรึงไว้ที่ด้านล่าง */
+            left: 0;
             width: 100%;
-            margin-top: auto;
-            padding: 20px 0;
+            padding: 15px 10px;
             text-align: center;
+            background: rgba(255, 255, 255, 0.75);
+            box-sizing: border-box;
+            z-index: 10; /* ให้ footer อยู่ด้านบนสุด */
+            margin-top: 0; /* ลบ margin-top เดิมออก */
         }
 
-        .footer-box {
-            background: rgba(255, 255, 255, 0.75);
+        footer div {
+            max-width: 1000px; /* เพิ่ม max-width ให้เท่ากับในหน้า login */
             margin: auto;
-            padding: 15px 10px;
-            border-radius: 15px;
-            max-width: 800px;
             font-size: 0.9rem;
+            border-radius: 0; /* ลบ border-radius ออกเพื่อให้แนบชิดขอบ */
         }
+        /* --- End Footer Styles --- */
 
         @media (max-width: 768px) {
             .welcome-box h1 {
@@ -232,7 +242,7 @@
                 padding: 12px 24px;
             }
 
-            .footer-box {
+            footer div {
                 font-size: 0.75rem;
             }
         }
@@ -246,7 +256,6 @@
     <div class="welcome-box">
         <img src="assets/img/kid.webp" alt="การ์ตูนเด็ก" class="character-img" />
 
-        <!-- อีโมจิลอยหมุน -->
         <div class="emoji-fly emoji1">🌈</div>
         <div class="emoji-fly emoji2">🪐</div>
         <div class="emoji-fly emoji3">✨</div>
@@ -267,9 +276,8 @@
         <source src="assets/sound/welcome.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Footer -->
     <footer>
-        <div class="footer-box">
+        <div>
             <p class="mb-1">
                 พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
                 ครู โรงเรียนบ้านนาอุดม<br>
