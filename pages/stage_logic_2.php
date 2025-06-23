@@ -14,7 +14,6 @@ $stage_id = 2;
     <meta charset="UTF-8" />
     <title>เกม OX ตรรกะ - ด่านที่ 2</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../assets/css/game_header.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script>
         const USER_ID = <?= $user_id ?>;
@@ -28,7 +27,20 @@ $stage_id = 2;
             background: linear-gradient(to right, #fef3c7, #bae6fd);
             margin: 0;
         }
-      
+
+        #top-bar {
+            background-color: #fde68a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
         #game-container {
             width: 100%;
             max-width: 600px;
@@ -80,6 +92,30 @@ $stage_id = 2;
             max-width: 800px;
             font-size: 0.9rem;
         }
+
+        #nextStageBtn {
+            animation: pulse 1s infinite;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #countdown {
+            font-size: 1rem;
+            color: #d97706;
+            margin-left: 10px;
+            display: none;
+        }
     </style>
 </head>
 
@@ -99,19 +135,11 @@ $stage_id = 2;
         </div>
     </div>
 
-    <div class="text-center mt-3">
+    <div class="text-center">
         <a href="stage_logic_3.php" id="nextStageBtn" class="btn btn-success btn-sm" style="display:none;">
             ไปด่านถัดไป ▶️</a>
-        <div id="countdown" style="display:none;">
-            <p>⏳ เปลี่ยนด่านใน <span id="seconds">10</span> วินาที...</p>
-            <div class="progress mx-auto" style="height: 20px; max-width: 300px;">
-                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" id="progress-bar"
-                    role="progressbar" style="width: 100%">
-                </div>
-            </div>
-        </div>
+        <span id="countdown">(กำลังไปใน <span id="seconds">10</span> วินาที...)</span>
     </div>
-
 
     <div id="game-container"></div>
 
@@ -121,21 +149,14 @@ $stage_id = 2;
         const nextBtn = document.getElementById("nextStageBtn");
         const countdownText = document.getElementById("countdown");
         const secondsSpan = document.getElementById("seconds");
-        const progressBar = document.getElementById("progress-bar");
 
         function triggerAutoNextStage() {
             nextBtn.style.display = 'inline-block';
-            countdownText.style.display = 'block';
-
+            countdownText.style.display = 'inline';
             let count = 10;
-            secondsSpan.textContent = count;
-            progressBar.style.width = '100%';
-
             const timer = setInterval(() => {
                 count--;
                 secondsSpan.textContent = count;
-                progressBar.style.width = (count * 10) + "%";
-
                 if (count <= 0) {
                     clearInterval(timer);
                     window.location.href = nextBtn.href;
