@@ -77,21 +77,18 @@ $stage_id = 1;
       }
     }
 
-        footer {
-            width: 100%;
-            margin-top: auto;
-            padding: 20px 0;
-            text-align: center;
-        }
+    footer {
+      text-align: center;
+      padding: 15px 10px;
+      background: rgba(255, 255, 255, 0.75);
+    }
 
-        .footer-box {
-            background: rgba(255, 255, 255, 0.75);
-            margin: auto;
-            padding: 15px 10px;
-            border-radius: 15px;
-            max-width: 800px;
-            font-size: 0.9rem;
-        }
+    footer div {
+      max-width: 1000px;
+      margin: auto;
+      font-size: 0.9rem;
+      border-radius: 15px;
+    }
   </style>
 </head>
 
@@ -110,29 +107,6 @@ $stage_id = 1;
       <a href="stage_logic_2.php" button id="nextStageBtn" class="btn btn-success btn-sm" style="display: none;">ไปด่านถัดไป ▶️</a>
     </div>
   </div>
-
-  <div id="instruction-box"></div>
-
-<!-- กล่องแสดงกติกา -->
-<div id="instruction-box" style="
-  background-color: #fff8dc;
-  border: 3px dashed #facc15;
-  border-radius: 16px;
-  padding: 20px;
-  max-width: 900px;
-  margin: 20px auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-">
-  <h4 style="margin-top:0; font-weight: bold; color: #b45309;">📝 วิธีเล่น</h4>
-  <p style="font-size: 1.1rem; margin-bottom: 8px;">
-    ให้สังเกตลำดับภาพสัตว์ที่ปรากฏ แล้วลากภาพสัตว์ให้เรียงลำดับให้ถูกต้องตามแบบที่แสดง
-    โดยภาพจะมีการ <strong>วนซ้ำลำดับ 3 ตัว</strong> ทั้งหมด <strong>2 รอบ</strong>
-    จากนั้นให้นักเรียน <strong>ลากภาพที่หายไป</strong> มาใส่ในตำแหน่งที่ถูกต้อง
-  </p>
-  <p style="font-size: 1rem; color: #92400e;">
-    🎯 เป้าหมาย: วางภาพสัตว์ให้ตรงตำแหน่งที่หายไปทั้ง 2 ช่องให้ถูกต้อง
-  </p>
-</div>
 
   <!-- พื้นที่เกม -->
   <div id="game-wrapper">
@@ -160,7 +134,14 @@ $stage_id = 1;
     }
   </style>
 
-    <?php include '../includes/student_footer.php'; ?>
+  <footer>
+    <div>
+      <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
+        ครู โรงเรียนบ้านนาอุดม<br>
+        สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร</p>
+      <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 
 </html>
