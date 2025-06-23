@@ -14,6 +14,7 @@ $stage_id = 2;
     <meta charset="UTF-8" />
     <title>เกม OX ตรรกะ - ด่านที่ 2</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/css/game_header.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script>
         const USER_ID = <?= $user_id ?>;
@@ -27,16 +28,7 @@ $stage_id = 2;
             background: linear-gradient(to right, #fef3c7, #bae6fd);
             margin: 0;
         }
-
-        #top-bar {
-            background-color: #fde68a;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
+      
         #game-container {
             width: 100%;
             max-width: 600px;
@@ -74,67 +66,100 @@ $stage_id = 2;
         }
 
         footer {
+            width: 100%;
+            margin-top: auto;
+            padding: 20px 0;
             text-align: center;
-            padding: 15px 10px;
-            background: rgba(255, 255, 255, 0.75);
         }
 
-        footer div {
-            max-width: 1000px;
+        .footer-box {
+            background: rgba(255, 255, 255, 0.75);
             margin: auto;
-            font-size: 0.9rem;
+            padding: 15px 10px;
             border-radius: 15px;
+            max-width: 800px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="top-bar">
-        <div>
-            👦 ผู้เล่น: <strong><?= $_SESSION['name'] ?></strong> |
-            🧩 เกม: <strong>OX ตรรกะ</strong> |
-            🧠 ด่านที่: <strong>2</strong> |
-            🌟 คะแนนรวม: <strong id="total-score">--</strong>
-        </div>
-        <div>
-            <a href="student_dashboard.php" class="btn btn-primary btn-sm">กลับแดชบอร์ด</a>
-            <a href="stage_logic_3.php" id="nextStageBtn" class="btn btn-success btn-sm"
-                style="display:none;">ไปด่านถัดไป ▶️</a>
+    <?php
+    $game_title = "OX ตรรกะ";
+    $next_stage_link = "stage_logic_3.php";
+    include '../includes/game_header.php';
+    ?>
+    <div class="container mt-4" style="max-width: 700px;">
+        <div class="alert alert-warning" role="alert" style="font-size: 1.1rem;">
+            <strong>📝 วิธีการเล่น:</strong><br>
+            เล่นเกม OX กับคอมพิวเตอร์ โดยคุณเป็นฝั่ง <strong>⭕</strong> และคอมเป็น <strong>❌</strong><br>
+            เป้าหมายคือ ชนะให้ได้ <strong>3 ใน 5 เกม</strong> จึงจะผ่านด่านนี้ได้<br>
+            ใช้ทักษะการวางแผนและการคาดการณ์ล่วงหน้าอย่างมีเหตุผล!
         </div>
     </div>
+
+    <div class="text-center mt-3">
+        <a href="stage_logic_3.php" id="nextStageBtn" class="btn btn-success btn-sm" style="display:none;">
+            ไปด่านถัดไป ▶️</a>
+        <div id="countdown" style="display:none;">
+            <p>⏳ เปลี่ยนด่านใน <span id="seconds">10</span> วินาที...</p>
+            <div class="progress mx-auto" style="height: 20px; max-width: 300px;">
+                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" id="progress-bar"
+                    role="progressbar" style="width: 100%">
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="game-container"></div>
 
     <div id="feedback-popup"></div>
 
-    <footer>
-        <div>
-            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
-                ครู โรงเรียนบ้านนาอุดม<br>
-                สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร</p>
-            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai. All rights
-                reserved.</p>
-        </div>
-    </footer>
+    <script>
+        const nextBtn = document.getElementById("nextStageBtn");
+        const countdownText = document.getElementById("countdown");
+        const secondsSpan = document.getElementById("seconds");
+        const progressBar = document.getElementById("progress-bar");
+
+        function triggerAutoNextStage() {
+            nextBtn.style.display = 'inline-block';
+            countdownText.style.display = 'block';
+
+            let count = 10;
+            secondsSpan.textContent = count;
+            progressBar.style.width = '100%';
+
+            const timer = setInterval(() => {
+                count--;
+                secondsSpan.textContent = count;
+                progressBar.style.width = (count * 10) + "%";
+
+                if (count <= 0) {
+                    clearInterval(timer);
+                    window.location.href = nextBtn.href;
+                }
+            }, 1000);
+        }
+        window.triggerAutoNextStage = triggerAutoNextStage; // ให้ stage2.js เรียกใช้ได้
+    </script>
 
     <?php
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $score = (int) $_POST['score'];
         $completed_at = ($score === 100) ? date('Y-m-d H:i:s') : null;
 
-        // อัปเดต progress
         $stmt = $conn->prepare("INSERT INTO progress (user_id, stage_id, score, attempts, completed_at)
-      VALUES (?, ?, ?, 1, ?)
-      ON DUPLICATE KEY UPDATE
-      score = VALUES(score),
-      attempts = attempts + 1,
-      completed_at = VALUES(completed_at)");
+        VALUES (?, ?, ?, 1, ?)
+        ON DUPLICATE KEY UPDATE
+        score = VALUES(score),
+        attempts = attempts + 1,
+        completed_at = VALUES(completed_at)");
         $stmt->bind_param("iiis", $user_id, $stage_id, $score, $completed_at);
         $stmt->execute();
         $stmt->close();
 
-        // log การกระทำ
         $action = ($score === 100) ? 'pass' : 'fail';
         $detail = json_encode(['score' => $score]);
         $stmt = $conn->prepare("INSERT INTO game_logs (user_id, stage_id, action, detail) VALUES (?, ?, ?, ?)");
@@ -146,6 +171,7 @@ $stage_id = 2;
     }
     ?>
 
+    <?php include '../includes/student_footer.php'; ?>
 </body>
 
 </html>

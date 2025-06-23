@@ -1,3 +1,5 @@
+// stage1.js
+
 function updateScoreBar() {
   fetch('../api/get_total_score.php')
     .then(res => res.json())
@@ -123,15 +125,17 @@ function checkCompletion(scene) {
       // ซ่อนหลัง 3 วินาที
       setTimeout(() => popup.style.display = 'none', 3000);
 
-      document.getElementById('nextStageBtn').style.display = 'inline-block';
-      sendResult(2); // ส่งคะแนน 2 ช่อง = ผ่าน
+      // ส่งผลและเริ่ม countdown ไปด่านถัดไป
+      // sendResult(2) จะเป็นตัวเรียก triggerAutoNextStage() เอง
+      sendResult(2);
     });
   }
 }
 
+// ... โค้ดส่วนบนของ stage1.js ...
 
 function sendResult(score) {
-  fetch('../api/log_action.php', {
+  return fetch('../api/log_action.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -140,8 +144,22 @@ function sendResult(score) {
       action: score === 2 ? 'pass' : 'fail',
       detail: JSON.stringify({ score })
     })
-  }).then(() => {
-    updateScoreBar(); // อัปเดตคะแนนทันทีหลังส่งผล
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Result logged:', data);
+    updateScoreBar(); // อัปเดตคะแนน
+    console.log('Attempting to trigger auto next stage...'); // เพิ่ม log ตรงนี้
+    triggerAutoNextStage(); // <--- จุดที่เรียกฟังก์ชันนับถอยหลัง
+  })
+  .catch(error => {
+    console.error('Error sending result:', error);
   });
 }
 
+// ... โค้ดส่วนล่างของ stage1.js ...
