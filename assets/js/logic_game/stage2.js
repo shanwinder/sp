@@ -120,6 +120,7 @@ function create() {
     if (playerWins >= 3) {
       showPopup('🏆 ชนะครบ 3 รอบ! ผ่านด่าน');
       sendResult(100);
+      window.triggerAutoNextStage();
       return;
     } else if (computerWins >= 2) {
       showPopup('😢 แพ้ 2 ครั้ง เริ่มใหม่');
@@ -158,7 +159,6 @@ function create() {
         .then(data => {
           document.getElementById('total-score').textContent = data.score;
 
-          // ✅ แสดงปุ่มไปด่านถัดไป
           const nextBtn = document.getElementById('nextStageBtn');
           if (nextBtn) {
             nextBtn.style.display = 'inline-block';
@@ -170,7 +170,6 @@ function create() {
     });
   }
 
-  // วาดกระดาน
   for (let i = 0; i < 9; i++) {
     const x = (i % 3) * size + offsetX;
     const y = Math.floor(i / 3) * size + offsetY;
