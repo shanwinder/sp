@@ -115,8 +115,8 @@ function getGameProgress($conn, $user_id, $game_id)
             content: '';
             position: absolute;
             /* เพิ่มขนาดดาวเป็น 3px ให้เห็นชัดขึ้น */
-            width: 3px;
-            height: 3px;
+            width: 2px;
+            height: 2px;
             background: white;
             border-radius: 50%;
             box-shadow:
@@ -228,8 +228,8 @@ function getGameProgress($conn, $user_id, $game_id)
             /* แอนิเมชันสำหรับ hover */
             transform: translateY(-20px) rotate(-5deg) scale(1.08); /* เลื่อนขึ้น หมุนเล็กน้อย และขยาย */
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.4);
-            border-color: #6a5acd;
-            outline: 2px solid #6a5acd;
+            border-color:rgb(124, 104, 255);
+            outline: 2px solidrgb(124, 104, 255);
         }
 
         .game-overlay {
