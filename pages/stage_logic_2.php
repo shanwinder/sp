@@ -5,7 +5,10 @@ require_once '../includes/db.php';
 
 $user_id = $_SESSION['user_id'];
 $stage_id = 2;
+$game_title = "OX ตรรกะ";
+$next_stage_link = "stage_logic_3.php";
 ?>
+
 
 <!DOCTYPE html>
 <html lang="th">
@@ -28,14 +31,18 @@ $stage_id = 2;
             margin: 0;
         }
 
-        #top-bar {
-            background-color: #fde68a;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+    #top-bar {
+      background-color: #fde68a;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
         #game-container {
             width: 100%;
@@ -74,49 +81,33 @@ $stage_id = 2;
         }
 
         footer {
+            width: 100%;
+            margin-top: auto;
+            padding: 20px 0;
             text-align: center;
-            padding: 15px 10px;
-            background: rgba(255, 255, 255, 0.75);
         }
 
-        footer div {
-            max-width: 1000px;
+        .footer-box {
+            background: rgba(255, 255, 255, 0.75);
             margin: auto;
-            font-size: 0.9rem;
+            padding: 15px 10px;
             border-radius: 15px;
+            max-width: 800px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="top-bar">
-        <div>
-            👦 ผู้เล่น: <strong><?= $_SESSION['name'] ?></strong> |
-            🧩 เกม: <strong>OX ตรรกะ</strong> |
-            🧠 ด่านที่: <strong>2</strong> |
-            🌟 คะแนนรวม: <strong id="total-score">--</strong>
-        </div>
-        <div>
-            <a href="student_dashboard.php" class="btn btn-primary btn-sm">กลับแดชบอร์ด</a>
-            <a href="stage_logic_3.php" id="nextStageBtn" class="btn btn-success btn-sm"
-                style="display:none;">ไปด่านถัดไป ▶️</a>
-        </div>
-    </div>
+<?php include '../includes/game_header.php'; ?>
+
 
     <div id="game-container"></div>
 
     <div id="feedback-popup"></div>
 
-    <footer>
-        <div>
-            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>
-                ครู โรงเรียนบ้านนาอุดม<br>
-                สังกัดสำนักงานเขตพื้นที่การศึกษาประถมศึกษามุกดาหาร</p>
-            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai. All rights
-                reserved.</p>
-        </div>
-    </footer>
+    <?php include '../includes/student_footer.php'; ?>
 
     <?php
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -145,6 +136,35 @@ $stage_id = 2;
         exit;
     }
     ?>
+
+<script>
+window.triggerAutoNextStage = function () {
+    const nextBtn = document.getElementById("nextStageBtn");
+    const secondsSpan = document.getElementById("seconds");
+    const overlay = document.getElementById("progress-overlay");
+
+    if (!nextBtn || !secondsSpan || !overlay) {
+        console.warn("ไม่พบปุ่มหรือองค์ประกอบสำหรับไปด่านถัดไป");
+        return;
+    }
+
+    nextBtn.style.display = 'inline-block';
+    let count = 10;
+    secondsSpan.textContent = count;
+    overlay.style.width = '100%';
+
+    const timer = setInterval(() => {
+        count--;
+        secondsSpan.textContent = count;
+        overlay.style.width = (count * 10) + "%";
+
+        if (count <= 0) {
+            clearInterval(timer);
+            window.location.href = nextBtn.href;
+        }
+    }, 1000);
+}
+</script>
 
 </body>
 

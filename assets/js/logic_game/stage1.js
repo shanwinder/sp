@@ -1,3 +1,5 @@
+// stage1.js - สำหรับเกมลำดับภาพสัตว์ ด่านที่ 1
+
 function updateScoreBar() {
   fetch('../api/get_total_score.php')
     .then(res => res.json())
@@ -6,7 +8,6 @@ function updateScoreBar() {
     })
     .catch(err => console.error("Error fetching score:", err));
 }
-
 
 const config = {
   type: Phaser.AUTO,
@@ -28,7 +29,7 @@ function preload() {
 }
 
 function create() {
-  updateScoreBar(); // โหลดคะแนนทันทีเมื่อเปิดเกม
+  updateScoreBar();
   const scene = this;
   const sequence = ["dog", "cat", "rabbit", "dog", "cat", "rabbit"];
   const missingIndices = [2, 4];
@@ -60,7 +61,6 @@ function create() {
       .setData("type", animal);
     dragItem.originalX = dragItem.x;
     dragItem.originalY = dragItem.y;
-
     scene.input.setDraggable(dragItem);
   });
 
@@ -111,7 +111,9 @@ function create() {
 }
 
 function checkCompletion(scene) {
-  const filledZones = scene.children.list.filter(c => c.getData && c.getData('filled'));
+  const filledZones = scene.children.list.filter(
+    c => c.getData && c.getData('filled')
+  );
   if (filledZones.length === 2) {
     scene.time.delayedCall(600, () => {
       const popup = document.getElementById('feedback-popup');
@@ -119,19 +121,20 @@ function checkCompletion(scene) {
         🎉 เก่งมาก!<br>คุณตอบถูกทั้งหมด<br><small>ได้รับ +100 คะแนน</small>
       `;
       popup.style.display = 'block';
-
-      // ซ่อนหลัง 3 วินาที
       setTimeout(() => popup.style.display = 'none', 3000);
-
-      document.getElementById('nextStageBtn').style.display = 'inline-block';
-      sendResult(2); // ส่งคะแนน 2 ช่อง = ผ่าน
+      sendResult(2).then(() => {
+        if (typeof triggerAutoNextStage === 'function') {
+          triggerAutoNextStage();
+        } else {
+          console.warn("ไม่พบฟังก์ชัน triggerAutoNextStage");
+        }
+      });
     });
   }
 }
 
-
 function sendResult(score) {
-  fetch('../api/log_action.php', {
+  return fetch('../api/log_action.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -141,7 +144,6 @@ function sendResult(score) {
       detail: JSON.stringify({ score })
     })
   }).then(() => {
-    updateScoreBar(); // อัปเดตคะแนนทันทีหลังส่งผล
+    updateScoreBar();
   });
 }
-
