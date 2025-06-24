@@ -17,15 +17,18 @@ $next_stage_link = "stage_logic_4.php";
 <head>
     <meta charset="UTF-8" />
     <title>เติมลำดับตัวเลข - ด่านที่ 3</title>
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="../assets/css/game_common.css">
-    <link rel="stylesheet" href="../assets/css/game_header.css"> <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/game_header.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script>
         const USER_ID = <?= $user_id ?>;
         const STAGE_ID = <?= $stage_id ?>;
         const USER_NAME = "<?= $_SESSION['name'] ?>";
     </script>
-    <script src="../assets/js/shared/game_common.js"></script> <script src="../assets/js/logic_game/stage3.js"></script>
+    <script src="../assets/js/shared/game_common.js"></script>
+    <script src="../assets/js/logic_game/stage3.js"></script>
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -121,7 +124,8 @@ $next_stage_link = "stage_logic_4.php";
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 ">
         <h4 style="margin-top:0; font-weight: bold; color: #b45309;">📝 วิธีเล่น</h4>
-        <p style="font-size: 1.1rem; margin-bottom: 8px;">เติมตัวเลขที่หายไปในลำดับให้ถูกต้อง ตอบถูกครบทั้ง <strong>5 ข้อ</strong> จึงจะผ่านด่านนี้ได้</p>
+        <p style="font-size: 1.1rem; margin-bottom: 8px;">เติมตัวเลขที่หายไปในลำดับให้ถูกต้อง ตอบถูกครบทั้ง <strong>5
+                ข้อ</strong> จึงจะผ่านด่านนี้ได้</p>
         <p style="font-size: 1rem; color: #92400e;">
             ใช้ทักษะการสังเกตและคิดเป็นขั้นตอนนะ!</p>
     </div>
@@ -163,6 +167,9 @@ $next_stage_link = "stage_logic_4.php";
         exit;
     }
     ?>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

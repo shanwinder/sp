@@ -61,7 +61,8 @@ function getGameProgress($conn, $user_id, $game_id)
 <head>
     <meta charset="UTF-8" />
     <title>แดชบอร์ดนักเรียน</title>
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
     <style>
         body {
@@ -131,26 +132,30 @@ function getGameProgress($conn, $user_id, $game_id)
                 850px 100px white, 250px 900px white, 650px 400px white,
                 150px 50px white, 300px 850px white, 700px 700px white,
                 400px 20px white, 900px 500px white,
-                100px 100px white, 200px 600px white, 700px 900px white, 850px 50px white; /* เพิ่มดาวอีก */
+                100px 100px white, 200px 600px white, 700px 900px white, 850px 50px white;
+            /* เพิ่มดาวอีก */
             animation: twinkle 2s infinite ease-in-out alternate;
         }
 
         .star-layer.layer-1 {
             transform: translateZ(0);
             animation-duration: 60s;
-            opacity: 0.9; /* เพิ่มความชัดเจน */
+            opacity: 0.9;
+            /* เพิ่มความชัดเจน */
         }
 
         .star-layer.layer-2 {
             transform: translateZ(-1px) scale(1.5);
             animation-duration: 120s;
-            opacity: 0.7; /* เพิ่มความชัดเจน */
+            opacity: 0.7;
+            /* เพิ่มความชัดเจน */
         }
 
         .star-layer.layer-3 {
             transform: translateZ(-2px) scale(2);
             animation-duration: 180s;
-            opacity: 0.5; /* เพิ่มความชัดเจน */
+            opacity: 0.5;
+            /* เพิ่มความชัดเจน */
         }
 
         @keyframes moveStars {
@@ -210,7 +215,8 @@ function getGameProgress($conn, $user_id, $game_id)
             animation: slideUp 0.7s ease forwards;
             /* กำหนด transition สำหรับการ hover */
             transition: transform 0.3s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
-            transform-style: preserve-3d; /* สำหรับการหมุน 3D ในอนาคต (ถ้ามี) */
+            transform-style: preserve-3d;
+            /* สำหรับการหมุน 3D ในอนาคต (ถ้ามี) */
         }
 
         @keyframes slideUp {
@@ -218,6 +224,7 @@ function getGameProgress($conn, $user_id, $game_id)
                 transform: translateY(30px);
                 opacity: 0;
             }
+
             100% {
                 transform: translateY(0);
                 opacity: 1;
@@ -226,9 +233,10 @@ function getGameProgress($conn, $user_id, $game_id)
 
         .game-card:hover {
             /* แอนิเมชันสำหรับ hover */
-            transform: translateY(-20px) rotate(-5deg) scale(1.08); /* เลื่อนขึ้น หมุนเล็กน้อย และขยาย */
+            transform: translateY(-20px) rotate(-5deg) scale(1.08);
+            /* เลื่อนขึ้น หมุนเล็กน้อย และขยาย */
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.4);
-            border-color:rgb(124, 104, 255);
+            border-color: rgb(124, 104, 255);
             outline: 2px solidrgb(124, 104, 255);
         }
 
@@ -364,7 +372,9 @@ function getGameProgress($conn, $user_id, $game_id)
     </main>
 
     <?php include '../includes/student_footer.php'; ?>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
