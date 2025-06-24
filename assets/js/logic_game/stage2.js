@@ -29,7 +29,16 @@ function preload() {
   this.load.audio('wrong', '../assets/sound/wrong.mp3');
 }
 
+function updateScoreBar() {
+  fetch('../api/get_total_score.php')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('total-score').textContent = data.score;
+    });
+}
+
 function create() {
+  updateScoreBar();
   const scene = this;
   const size = 130;
   const boardSize = 3;
@@ -120,7 +129,6 @@ function create() {
     if (playerWins >= 3) {
       showPopup('🏆 ชนะครบ 3 รอบ! ผ่านด่าน');
       sendResult(100);
-      window.triggerAutoNextStage();
       return;
     } else if (computerWins >= 2) {
       showPopup('😢 แพ้ 2 ครั้ง เริ่มใหม่');
@@ -137,6 +145,7 @@ function create() {
     roundsPlayed++;
     initBoard();
   }
+
 
   function showPopup(msg) {
     const popup = document.getElementById('feedback-popup');
@@ -160,12 +169,15 @@ function create() {
           document.getElementById('total-score').textContent = data.score;
 
           const nextBtn = document.getElementById('nextStageBtn');
-          if (nextBtn) {
+          if (window.triggerAutoNextStage) {
+            window.triggerAutoNextStage(); // ✅ เรียกฟังก์ชันนับถอยหลังและ progress bar
+          } else {
             nextBtn.style.display = 'inline-block';
             nextBtn.onclick = () => {
               window.location.href = 'stage_logic_3.php';
             };
           }
+
         });
     });
   }

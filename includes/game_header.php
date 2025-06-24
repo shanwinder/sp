@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 // ตรวจสอบว่ามี session หรือยัง
 if (!isset($_SESSION))
     session_start();
@@ -19,43 +18,19 @@ $next_stage_link = $next_stage_link ?? '#';
     </div>
     <div>
         <a href="student_dashboard.php" class="btn btn-primary btn-sm">กลับแดชบอร์ด</a>
-        <a href="<?= $next_stage_link ?>" id="nextStageBtn" class="btn btn-success btn-sm"
-            style="display: none; position: relative;">
+
+        <div id="nextStageBtn" class="btn btn-success btn-sm"
+            style="display: none; position: relative; cursor: pointer;"
+            onclick="location.href='<?= $next_stage_link ?>'">
             <span class="btn-label" style="position: relative; z-index: 2;">
                 ▶️ ไปด่านถัดไป (<span id="seconds">10</span>)
             </span>
-
-            <div class="btn-progress" id="progress-overlay" style="
+            <div id="progress-overlay" style="
                 position: absolute;
                 top: 0; left: 0; height: 100%;
                 width: 100%; background-color: rgba(255, 255, 255, 0.25);
                 z-index: 1; transition: width 1s linear; border-radius: 8px;">
             </div>
-        </a>
-
+        </div>
     </div>
-=======
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
-  header("Location: ../pages/login.php");
-  exit();
-}
-?>
-<div id="top-bar">
-  <div>
-    👦 ผู้เล่น: <strong><?= $_SESSION['name'] ?></strong> |
-    🧩 เกม: <strong><?= $game_title ?? 'ไม่ระบุเกม' ?></strong> |
-    🧠 ด่านที่: <strong><?= $stage_id ?></strong> |
-    🌟 คะแนนรวม: <strong id="total-score">--</strong>
-  </div>
-  <div>
-    <a href="student_dashboard.php" class="btn btn-primary btn-sm">กลับแดชบอร์ด</a>
-
-
-  </div>
-  <div class="text-center">
-    <a href="stage_logic_3.php" id="nextStageBtn" class="btn btn-success btn-sm" style="display:none;">
-      ไปด่านถัดไป ▶️</a>
-    <span id="countdown">(กำลังไปใน <span id="seconds">10</span> วินาที...)</span>
-  </div>
->>>>>>> 75573f659dbf7d25a99c20a39778118c4cb8c51f
 </div>

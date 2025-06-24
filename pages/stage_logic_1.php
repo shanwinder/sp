@@ -39,7 +39,6 @@ $next_stage_link = "stage_logic_2.php";
       display: flex;
       justify-content: space-between;
       align-items: center;
-<<<<<<< HEAD
       flex-wrap: wrap;
       position: sticky;
       top: 0;
@@ -48,10 +47,6 @@ $next_stage_link = "stage_logic_2.php";
     }
 
 
-=======
-    }
-
->>>>>>> 75573f659dbf7d25a99c20a39778118c4cb8c51f
     #game-wrapper {
       flex: 1;
       display: flex;
@@ -90,66 +85,28 @@ $next_stage_link = "stage_logic_2.php";
       }
     }
 
-        footer {
-            width: 100%;
-            margin-top: auto;
-            padding: 20px 0;
-            text-align: center;
-        }
+    footer {
+      width: 100%;
+      margin-top: auto;
+      padding: 20px 0;
+      text-align: center;
+    }
 
-        .footer-box {
-            background: rgba(255, 255, 255, 0.75);
-            margin: auto;
-            padding: 15px 10px;
-            border-radius: 15px;
-            max-width: 800px;
-            font-size: 0.9rem;
-        }
+    .footer-box {
+      background: rgba(255, 255, 255, 0.75);
+      margin: auto;
+      padding: 15px 10px;
+      border-radius: 15px;
+      max-width: 800px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 
 <body>
 
   <!-- แถบด้านบน -->
-<<<<<<< HEAD
   <?php include '../includes/game_header.php'; ?>
-=======
-  <div id="top-bar">
-    <div>
-      👦 ผู้เล่น: <strong><?= $_SESSION['name'] ?></strong> |
-      🧩 เกม: <strong>ลำดับภาพสัตว์</strong> |
-      🧠 ด่านที่: <strong>1</strong> |
-      🌟 คะแนนรวม: <strong id="total-score">--</strong>
-    </div>
-    <div>
-      <a href="student_dashboard.php" class="btn btn-primary btn-sm">กลับแดชบอร์ด</a>
-      <a href="stage_logic_2.php" button id="nextStageBtn" class="btn btn-success btn-sm" style="display: none;">ไปด่านถัดไป ▶️</a>
-    </div>
-  </div>
-
-  <div id="instruction-box"></div>
-
-<!-- กล่องแสดงกติกา -->
-<div id="instruction-box" style="
-  background-color: #fff8dc;
-  border: 3px dashed #facc15;
-  border-radius: 16px;
-  padding: 20px;
-  max-width: 900px;
-  margin: 20px auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-">
-  <h4 style="margin-top:0; font-weight: bold; color: #b45309;">📝 วิธีเล่น</h4>
-  <p style="font-size: 1.1rem; margin-bottom: 8px;">
-    ให้สังเกตลำดับภาพสัตว์ที่ปรากฏ แล้วลากภาพสัตว์ให้เรียงลำดับให้ถูกต้องตามแบบที่แสดง
-    โดยภาพจะมีการ <strong>วนซ้ำลำดับ 3 ตัว</strong> ทั้งหมด <strong>2 รอบ</strong>
-    จากนั้นให้นักเรียน <strong>ลากภาพที่หายไป</strong> มาใส่ในตำแหน่งที่ถูกต้อง
-  </p>
-  <p style="font-size: 1rem; color: #92400e;">
-    🎯 เป้าหมาย: วางภาพสัตว์ให้ตรงตำแหน่งที่หายไปทั้ง 2 ช่องให้ถูกต้อง
-  </p>
-</div>
->>>>>>> 75573f659dbf7d25a99c20a39778118c4cb8c51f
 
   <!-- พื้นที่เกม -->
   <div id="game-wrapper">
@@ -177,8 +134,7 @@ $next_stage_link = "stage_logic_2.php";
     }
   </style>
 
-    <?php include '../includes/student_footer.php'; ?>
-<<<<<<< HEAD
+  <?php include '../includes/student_footer.php'; ?>
 
   <script>
     window.triggerAutoNextStage = function () {
@@ -211,8 +167,6 @@ $next_stage_link = "stage_logic_2.php";
 
 
 
-=======
->>>>>>> 75573f659dbf7d25a99c20a39778118c4cb8c51f
 </body>
 
 </html>
