@@ -1,10 +1,13 @@
 <?php
 session_start();
 require_once '../includes/auth.php';
-require_once '../includes/db.php';
+require_once '../includes/db.php'; // ✅ เพิ่มบรรทัดนี้
+
 
 $user_id = $_SESSION['user_id'];
 $stage_id = 2;
+$game_title = "OX ตรรกะ";
+$next_stage_link = "stage_logic_3.php";
 ?>
 
 <!DOCTYPE html>
@@ -15,30 +18,13 @@ $stage_id = 2;
     <title>เกม OX ตรรกะ - ด่านที่ 2</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script>
-        const USER_ID = <?= $user_id ?>;
-        const STAGE_ID = <?= $stage_id ?>;
-        const USER_NAME = "<?= $_SESSION['name'] ?>";
-    </script>
     <script src="../assets/js/logic_game/stage2.js"></script>
     <style>
         body {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(to right, #fef3c7, #bae6fd);
             margin: 0;
-        }
-
-        #top-bar {
-            background-color: #fde68a;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding-top: 80px;
         }
 
         #game-container {
@@ -92,79 +78,26 @@ $stage_id = 2;
             max-width: 800px;
             font-size: 0.9rem;
         }
-
-        #nextStageBtn {
-            animation: pulse 1s infinite;
-            font-weight: bold;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        #countdown {
-            font-size: 1rem;
-            color: #d97706;
-            margin-left: 10px;
-            display: none;
-        }
     </style>
 </head>
 
 <body>
 
     <?php
-    $game_title = "OX ตรรกะ";
-    $next_stage_link = "stage_logic_3.php";
     include '../includes/game_header.php';
     ?>
     <div class="container mt-4" style="max-width: 700px;">
         <div class="alert alert-warning" role="alert" style="font-size: 1.1rem;">
             <strong>📝 วิธีการเล่น:</strong><br>
             เล่นเกม OX กับคอมพิวเตอร์ โดยคุณเป็นฝั่ง <strong>⭕</strong> และคอมเป็น <strong>❌</strong><br>
-            เป้าหมายคือ ชนะให้ได้ <strong>3 ใน 5 เกม</strong> จึงจะผ่านด่านนี้ได้<br>
+            เป้าหมายคือ ชนะให้ได้ <strong>3 ครั้งติดต่อกัน</strong> จึงจะผ่านด่านนี้ได้<br>
             ใช้ทักษะการวางแผนและการคาดการณ์ล่วงหน้าอย่างมีเหตุผล!
         </div>
-    </div>
-
-    <div class="text-center">
-        <a href="stage_logic_3.php" id="nextStageBtn" class="btn btn-success btn-sm" style="display:none;">
-            ไปด่านถัดไป ▶️</a>
-        <span id="countdown">(กำลังไปใน <span id="seconds">10</span> วินาที...)</span>
     </div>
 
     <div id="game-container"></div>
 
     <div id="feedback-popup"></div>
-
-    <script>
-        const nextBtn = document.getElementById("nextStageBtn");
-        const countdownText = document.getElementById("countdown");
-        const secondsSpan = document.getElementById("seconds");
-
-        function triggerAutoNextStage() {
-            nextBtn.style.display = 'inline-block';
-            countdownText.style.display = 'inline';
-            let count = 10;
-            const timer = setInterval(() => {
-                count--;
-                secondsSpan.textContent = count;
-                if (count <= 0) {
-                    clearInterval(timer);
-                    window.location.href = nextBtn.href;
-                }
-            }, 1000);
-        }
-        window.triggerAutoNextStage = triggerAutoNextStage; // ให้ stage2.js เรียกใช้ได้
-    </script>
 
     <?php
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {

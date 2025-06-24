@@ -2,9 +2,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('game-container');
 
   const problems = [
-    { sequence: [2, 4, null, 8], answer: 6 },
-    { sequence: [5, 10, null, 20], answer: 15 },
-    { sequence: [1, 3, null, 7], answer: 5 }
+    { sequence: [1, 2, null, 4], answer: 3 },      // ง่าย
+    { sequence: [2, 4, null, 8], answer: 6 },      // คูณด้วย 2
+    { sequence: [5, 10, null, 20], answer: 15 },   // บวก 5
+    { sequence: [1, 3, null, 7], answer: 5 },      // บวกทีละ 2
+    { sequence: [10, 8, null, 4], answer: 6 }      // ลบทีละ 2
   ];
 
   let current = 0;
@@ -12,10 +14,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const showProblem = () => {
     const p = problems[current];
     container.innerHTML = `
-      <div class="text-center">
-        <h3>เติมตัวเลขที่หายไป</h3>
-        <p style="font-size: 24px;">${p.sequence.map(n => n === null ? '<input id="ans" class="form-control d-inline" style="width:80px; display:inline;" />' : n).join(', ')}</p>
-        <button class="btn btn-success" onclick="checkAnswer()">ตรวจคำตอบ</button>
+      <div class="game-box text-center p-4">
+        <h3 style="font-size: 1.8rem;">เติมตัวเลขที่หายไป</h3>
+        <p style="font-size: 2rem;">
+          ${p.sequence.map(n => n === null ? '<input id="ans" class="form-control d-inline" style="width:90px; display:inline; font-size:1.8rem;" />' : n).join(' , ')}
+        </p>
+        <button class="btn btn-success mt-3" onclick="checkAnswer()" style="font-size: 1.2rem;">ตรวจคำตอบ</button>
       </div>
     `;
   };
@@ -60,15 +64,31 @@ window.addEventListener('DOMContentLoaded', () => {
       fetch('../api/get_total_score.php')
         .then(res => res.json())
         .then(data => {
-          document.getElementById('total-score').textContent = data.score;
-          if (window.triggerAutoNextStage) window.triggerAutoNextStage();
+          if (typeof animateScoreChange === 'function') {
+            animateScoreChange(data.score);
+          } else {
+            document.getElementById('total-score').textContent = data.score;
+          }
+        })
+        .then(() => {
+          setTimeout(() => {
+            if (window.triggerAutoNextStage) {
+              window.triggerAutoNextStage();
+            }
+          }, 300);
         });
     });
   }
 
   fetch('../api/get_total_score.php')
     .then(res => res.json())
-    .then(data => document.getElementById('total-score').textContent = data.score);
+    .then(data => {
+      if (typeof animateScoreChange === 'function') {
+        animateScoreChange(data.score);
+      } else {
+        document.getElementById('total-score').textContent = data.score;
+      }
+    });
 
   showProblem();
 });

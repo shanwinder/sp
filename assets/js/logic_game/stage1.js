@@ -1,12 +1,18 @@
-// stage1.js - สำหรับเกมลำดับภาพสัตว์ ด่านที่ 1
+// File: assets/js/logic_game/stage1.js
 
 function updateScoreBar() {
   fetch('../api/get_total_score.php')
     .then(res => res.json())
     .then(data => {
-      document.getElementById('total-score').textContent = data.score;
-    })
-    .catch(err => console.error("Error fetching score:", err));
+      const scoreEl = document.getElementById('total-score');
+      const current = parseInt(scoreEl.textContent) || 0;
+      const target = data.score || 0;
+      if (window.animateScoreChange) {
+        animateScoreChange(current, target); // ✅ แสดงแอนิเมชันเพิ่มคะแนน
+      } else {
+        scoreEl.textContent = target;
+      }
+    });
 }
 
 const config = {
@@ -52,7 +58,6 @@ function create() {
   }
 
   const options = Phaser.Utils.Array.Shuffle(["cat", "rabbit", "dog"]);
-
   options.forEach((animal, index) => {
     const dragItem = scene.add
       .image(200 + index * 200, 450, animal)
@@ -117,32 +122,25 @@ function checkCompletion(scene) {
   if (filledZones.length === 2) {
     scene.time.delayedCall(600, () => {
       const popup = document.getElementById('feedback-popup');
-      popup.innerHTML = `
-        🎉 เก่งมาก!<br>คุณตอบถูกทั้งหมด<br><small>ได้รับ +100 คะแนน</small>
-      `;
+      popup.innerHTML = `🎉 เก่งมาก!<br>คุณตอบถูกทั้งหมด<br><small>ได้รับ +100 คะแนน</small>`;
       popup.style.display = 'block';
       setTimeout(() => popup.style.display = 'none', 3000);
-      sendResult(2).then(() => {
+
+      sendStageScore(100).then(() => {
         if (typeof triggerAutoNextStage === 'function') {
           triggerAutoNextStage();
-        } else {
-          console.warn("ไม่พบฟังก์ชัน triggerAutoNextStage");
         }
       });
     });
   }
 }
 
-function sendResult(score) {
-  return fetch('../api/log_action.php', {
+function sendStageScore(score) {
+  // ✅ บันทึกคะแนนไปยังฐานข้อมูล (ผ่าน submit_stage_score.php)
+  return fetch('../api/submit_stage_score.php', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      user_id: USER_ID,
-      stage_id: STAGE_ID,
-      action: score === 2 ? 'pass' : 'fail',
-      detail: JSON.stringify({ score })
-    })
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `stage_id=${STAGE_ID}&score=${score}`
   }).then(() => {
     updateScoreBar();
   });

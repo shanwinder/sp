@@ -1,6 +1,5 @@
-// File: assets/js/logic_game/stage2.js
-
 let game;
+let autoNextStarted = false;
 
 window.onload = function () {
   const config = {
@@ -17,11 +16,11 @@ window.onload = function () {
   game = new Phaser.Game(config);
 };
 
-// ✅ โหลดคะแนนรวมเมื่อเปิดหน้าขึ้นมา
+// ✅ โหลดคะแนนรวมด้วยแอนิเมชัน
 fetch('../api/get_total_score.php')
   .then(res => res.json())
   .then(data => {
-    document.getElementById('total-score').textContent = data.score;
+    animateScore(data.score);
   });
 
 function preload() {
@@ -29,11 +28,27 @@ function preload() {
   this.load.audio('wrong', '../assets/sound/wrong.mp3');
 }
 
+function animateScore(newScore) {
+  const scoreElem = document.getElementById('total-score');
+  const current = parseInt(scoreElem.textContent) || 0;
+  const increment = Math.ceil((newScore - current) / 20);
+  let val = current;
+
+  const interval = setInterval(() => {
+    val += increment;
+    if ((increment > 0 && val >= newScore) || (increment < 0 && val <= newScore)) {
+      val = newScore;
+      clearInterval(interval);
+    }
+    scoreElem.textContent = val;
+  }, 40);
+}
+
 function updateScoreBar() {
   fetch('../api/get_total_score.php')
     .then(res => res.json())
     .then(data => {
-      document.getElementById('total-score').textContent = data.score;
+      animateScore(data.score);
     });
 }
 
@@ -127,12 +142,10 @@ function create() {
 
   function handleNextRound() {
     if (playerWins >= 3) {
-      showPopup('🏆 ชนะครบ 3 รอบ! ผ่านด่าน');
-      sendResult(100);
-      window.triggerAutoNextStage();
+      showPopup('🏆 ชนะครบ 3 รอบ! ผ่านด่าน', true);
       return;
     } else if (computerWins >= 2) {
-      showPopup('😢 แพ้ 2 ครั้ง เริ่มใหม่');
+      showPopup('😢 แพ้ 2 ครั้ง เริ่มใหม่', false);
       setTimeout(() => {
         roundsPlayed = 0;
         playerWins = 0;
@@ -147,38 +160,35 @@ function create() {
     initBoard();
   }
 
-
-  function showPopup(msg) {
+  function showPopup(msg, isFinal = false) {
     const popup = document.getElementById('feedback-popup');
     popup.innerHTML = msg;
     popup.style.display = 'block';
+
     setTimeout(() => {
       popup.style.display = 'none';
-      handleNextRound();
+      if (!isFinal) {
+        handleNextRound();
+      }
     }, 2500);
+
+    if (isFinal) {
+      sendResult(100).then(() => {
+        triggerAutoNextStage();
+      });
+    }
   }
 
   function sendResult(score) {
-    fetch('stage_logic_2.php', {
+    return fetch('stage_logic_2.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `score=${score}`
     }).then(() => {
-      fetch('../api/get_total_score.php')
+      return fetch('../api/get_total_score.php')
         .then(res => res.json())
         .then(data => {
-          document.getElementById('total-score').textContent = data.score;
-
-          const nextBtn = document.getElementById('nextStageBtn');
-          if (window.triggerAutoNextStage) {
-            window.triggerAutoNextStage(); // ✅ เรียกฟังก์ชันนับถอยหลังและ progress bar
-          } else {
-            nextBtn.style.display = 'inline-block';
-            nextBtn.onclick = () => {
-              window.location.href = 'stage_logic_3.php';
-            };
-          }
-
+          animateScore(data.score);
         });
     });
   }
@@ -186,7 +196,9 @@ function create() {
   for (let i = 0; i < 9; i++) {
     const x = (i % 3) * size + offsetX;
     const y = Math.floor(i / 3) * size + offsetY;
-    const bg = this.add.rectangle(x, y, size - 10, size - 10, 0xffffe0).setStrokeStyle(3, 0xfacc15).setInteractive();
+    const bg = this.add.rectangle(x, y, size - 10, size - 10, 0xffffe0)
+      .setStrokeStyle(3, 0xfacc15)
+      .setInteractive();
     const txt = this.add.text(x, y, '', {
       fontSize: '40px', color: '#1e293b', fontFamily: 'Kanit'
     }).setOrigin(0.5);
