@@ -1,8 +1,8 @@
 <?php
+// File: stage_logic_2.php
 session_start();
 require_once '../includes/auth.php';
-require_once '../includes/db.php'; // ✅ เพิ่มบรรทัดนี้
-
+require_once '../includes/db.php';
 
 $user_id = $_SESSION['user_id'];
 $stage_id = 2;
@@ -17,8 +17,16 @@ $next_stage_link = "stage_logic_3.php";
     <meta charset="UTF-8" />
     <title>เกม OX ตรรกะ - ด่านที่ 2</title>
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/css/game_common.css">
+    <link rel="stylesheet" href="../assets/css/game_header.css">
+
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="../assets/js/logic_game/stage2.js"></script>
+    <script>
+        const USER_ID = <?= $user_id ?>;
+        const STAGE_ID = <?= $stage_id ?>;
+    </script>
+    <script src="../assets/js/shared/game_common.js"></script> <script src="../assets/js/logic_game/stage2.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -100,6 +108,10 @@ $next_stage_link = "stage_logic_3.php";
     <div id="feedback-popup"></div>
 
     <?php
+    // ✅ ส่วนนี้จะถูกจัดการโดย submit_stage_score.php แล้ว
+    // ดังนั้นใน stage_logic_2.php ไม่จำเป็นต้องมี PHP POST block นี้อีกต่อไป
+    // ผมจะคอมเมนต์ส่วนนี้ไว้เพื่อแสดงให้เห็นว่าสามารถลบออกได้
+    /*
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $score = (int) $_POST['score'];
         $completed_at = ($score === 100) ? date('Y-m-d H:i:s') : null;
@@ -123,6 +135,7 @@ $next_stage_link = "stage_logic_3.php";
 
         exit;
     }
+    */
     ?>
 
     <?php include '../includes/student_footer.php'; ?>
