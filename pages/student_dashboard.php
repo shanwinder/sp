@@ -309,22 +309,6 @@ function getGameProgress($conn, $user_id, $game_id)
             }
         }
 
-        footer {
-            width: 100%;
-            margin-top: auto;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        .footer-box {
-            background: rgba(255, 255, 255, 0.75);
-            margin: auto;
-            padding: 15px 10px;
-            border-radius: 15px;
-            max-width: 800px;
-            font-size: 0.9rem;
-        }
-
         /* ลบ @keyframes bounceInHover; ทิ้งไป เพราะไม่ได้ใช้แล้ว */
     </style>
 </head>
