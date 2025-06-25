@@ -15,7 +15,8 @@
 <style>
     footer {
         width: 100%;
-        margin-top: auto; /* ดันให้อยู่ล่างสุดเสมอ */
+        margin-top: auto;
+        /* ดันให้อยู่ล่างสุดเสมอ */
         padding: 20px 0;
         text-align: center;
     }
@@ -42,5 +43,10 @@
 
     .footer-box .text-muted {
         color: #6b7280 !important;
+    }
+
+    footer,
+    #student-footer {
+        font-family: 'Kanit', sans-serif;
     }
 </style>
