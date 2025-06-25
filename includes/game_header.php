@@ -1,9 +1,13 @@
 <?php
 // File: includes/game_header.php (ฉบับแก้ไข Font)
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
-    // header("Location: ../pages/login.php"); // ปิดไว้ชั่วคราวเพื่อความสะดวกในการทดสอบ
-    // exit();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+// ตรวจสอบการล็อกอิน (สามารถเปิดใช้งานได้ในภายหลัง)
+// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
+//     header("Location: ../pages/login.php");
+//     exit();
+// }
 ?>
 
 <!-- ✅✅✅ ส่วนที่เพิ่มเข้ามา ✅✅✅ -->
