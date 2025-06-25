@@ -1,12 +1,17 @@
-// File: assets/js/logic_game/stage1.js (ฉบับสมบูรณ์)
+// File: assets/js/logic_game/stage1.js (ฉบับ Responsive)
 
 (function() {
     document.addEventListener('DOMContentLoaded', function() {
 
         const config = {
             type: Phaser.AUTO,
-            width: 900,
-            height: 600,
+            // ✅✅✅ ส่วนที่แก้ไข: เพิ่ม Scale Manager Configuration ✅✅✅
+            scale: {
+                mode: Phaser.Scale.FIT, // ปรับขนาดให้พอดีกับพื้นที่ โดยรักษาสัดส่วน
+                autoCenter: Phaser.Scale.CENTER_BOTH, // จัดเกมให้อยู่กึ่งกลางเสมอ
+                width: 900, // กำหนดความกว้างพื้นฐาน
+                height: 600 // กำหนดความสูงพื้นฐาน
+            },
             parent: "game-container",
             scene: {
                 preload: preload,
@@ -25,10 +30,10 @@
         function create() {
             const scene = this;
 
-            // --- UI พื้นฐาน ---
+            // ✅ ไม่ต้องแก้ไขโค้ดส่วนที่เหลือเลย เพราะ Scale Manager จะย่อส่วนทุกอย่างให้เอง
             const graphics = scene.add.graphics();
             graphics.fillGradientStyle(0x87CEEB, 0x87CEEB, 0x98FB98, 0x98FB98, 1);
-            graphics.fillRect(0, 0, config.width, config.height);
+            graphics.fillRect(0, 0, config.scale.width, config.scale.height); // ใช้ขนาดจาก config
             graphics.setDepth(-2);
             
             const puzzleZoneBg = scene.add.graphics();
@@ -39,7 +44,6 @@
             choiceZoneBg.fillStyle(0xe0f2fe, 0.9).fillRoundedRect(25, 350, 850, 225, 20).setDepth(-1);
             scene.add.text(450, 375, "ตัวเลือก: ลากไปวางในช่องว่าง", { fontSize: '24px', color: '#0c4a6e', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
 
-            // --- โครงสร้างเกม ---
             const sequence = ["dog", "cat", "rabbit", "dog", "cat", "rabbit"];
             const missingIndices = [2, 4];
             const dropZones = [];
@@ -66,11 +70,9 @@
                 scene.input.setDraggable(dragItem);
             });
 
-            // --- ตรรกะการลาก-วาง (แก้ไขสมบูรณ์) ---
             scene.input.on('dragstart', (pointer, gameObject) => {
                 scene.children.bringToTop(gameObject);
                 gameObject.setTint(0xfff7d6);
-                // ✅ แก้ไขปัญหาภาพใหญ่: ใช้ displayWidth/Height
                 scene.tweens.add({ targets: gameObject, displayWidth: 110, displayHeight: 110, duration: 150 });
             });
 
@@ -89,7 +91,7 @@
                     scene.tweens.add({
                         targets: gameObject,
                         x: dropZone.x, y: dropZone.y, 
-                        displayWidth: 100, displayHeight: 100, // ย่อกลับขนาดเดิม
+                        displayWidth: 100, displayHeight: 100,
                         duration: 200, ease: 'Power2'
                     });
                     
@@ -102,7 +104,7 @@
                     scene.tweens.add({
                         targets: gameObject,
                         x: gameObject.getData('originalX'), y: gameObject.getData('originalY'),
-                        displayWidth: 100, displayHeight: 100, // ย่อกลับขนาดเดิม
+                        displayWidth: 100, displayHeight: 100,
                         duration: 300, ease: 'Bounce.easeOut'
                     });
                 }
@@ -114,7 +116,7 @@
                     scene.tweens.add({
                         targets: gameObject,
                         x: gameObject.getData('originalX'), y: gameObject.getData('originalY'),
-                        displayWidth: 100, displayHeight: 100, // ย่อกลับขนาดเดิม
+                        displayWidth: 100, displayHeight: 100,
                         duration: 300, ease: 'Bounce.easeOut'
                     });
                 }
@@ -125,21 +127,20 @@
             const correctCount = dropZones.filter(zone => zone.getData('isFilled')).length;
             if (correctCount === dropZones.length) {
                 scene.time.delayedCall(800, () => {
-                    const container = scene.add.container(config.width / 2, config.height / 2);
+                    const container = scene.add.container(config.scale.width / 2, config.scale.height / 2);
                     container.setDepth(10);
                     container.setAlpha(0);
                     container.setScale(0.7);
 
-                    const rect = scene.add.rectangle(0, 0, config.width, config.height, 0x000000, 0.7).setInteractive();
+                    const rect = scene.add.rectangle(0, 0, config.scale.width, config.scale.height, 0x000000, 0.7).setInteractive();
                     container.add(rect);
 
-                    const winText = scene.add.text(0, -50, "🎉 เก่งมาก! ผ่านด่านลำดับภาพสัตว์แล้ว 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5);
+                    const winText = scene.add.text(0, -50, "🎉 เก่งมาก! ผ่านด่านที่ 1 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5);
                     container.add(winText);
 
                     const scoreText = scene.add.text(0, 20, 'ได้รับ +100 คะแนน', { fontSize: '32px', color: '#ffffff', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
                     container.add(scoreText);
 
-                    // ✅ แก้ไขปัญหาแอนิเมชัน: ใช้ onComplete
                     scene.tweens.add({
                         targets: container,
                         alpha: 1,
@@ -170,5 +171,6 @@
         }
 
         new Phaser.Game(config);
+
     });
 })();
