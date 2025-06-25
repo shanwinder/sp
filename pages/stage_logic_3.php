@@ -7,7 +7,7 @@ require_once '../includes/db.php';
 $user_id = $_SESSION['user_id'];
 $stage_id = 3;
 $game_title = "เติมลำดับตัวเลข";
-$next_stage_link = "stage_logic_4.php";
+$next_stage_link = "stage_logic_4.php"; // หรือด่านถัดไป
 
 ?>
 
@@ -17,80 +17,80 @@ $next_stage_link = "stage_logic_4.php";
 <head>
     <meta charset="UTF-8" />
     <title>เติมลำดับตัวเลข - ด่านที่ 3</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/game_common.css">
     <link rel="stylesheet" href="../assets/css/game_header.css">
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script>
-        const USER_ID = <?= $user_id ?>;
-        const STAGE_ID = <?= $stage_id ?>;
-        const USER_NAME = "<?= $_SESSION['name'] ?>";
-    </script>
-    <script src="../assets/js/shared/game_common.js"></script>
-    <script src="../assets/js/logic_game/stage3.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
-            background: linear-gradient(to right, #fef3c7, #bae6fd);
+            background: linear-gradient(to right, #87CEEB, #98FB98);
             margin: 0;
             padding-top: 80px;
-        }
-
-        #top-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #fffbe6;
-            padding: 10px 20px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 2px solid #fcd34d;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
-            z-index: 999;
         }
 
         #game-wrapper {
-            flex: 1;
+            position: relative;
+            /* ทำให้เป็นกรอบเขตแดนสำหรับ overlay */
+            width: 100%;
+            max-width: 700px;
+            background-color: #ffffffcc;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            padding: 30px;
+            min-height: 300px;
+        }
+
+        #win-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            margin-top: 80px;
+            z-index: 10;
+            border-radius: 20px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            /* ไม่ดักจับการคลิกเมื่อซ่อน */
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
 
-        #game-container {
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-            margin: 30px auto;
+        #win-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
 
-        #feedback-popup {
-            display: none;
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff8dc;
-            border: 3px solid #facc15;
-            padding: 30px;
-            border-radius: 16px;
-            font-size: 28px;
+        .win-box {
+            color: white;
             text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            z-index: 999;
+            transform: scale(0.7);
+            transition: transform 0.4s ease;
         }
 
-        .game-box {
-            border: 3px solid #60a5fa;
-            background: #eff6ff;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        #win-overlay.visible .win-box {
+            transform: scale(1);
         }
+
+        .win-box h2 {
+            font-size: 48px;
+            color: #fde047;
+            margin-bottom: 10px;
+        }
+
+        .win-box p {
+            font-size: 32px;
+        }
+
 
         footer {
             width: 100%;
@@ -114,63 +114,38 @@ $next_stage_link = "stage_logic_4.php";
 
     <?php include '../includes/game_header.php'; ?>
 
-    <div id="instruction-box" style="
-    background-color: #fff8dc;
-    border: 3px dashed #facc15;
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 700px;
-    margin: 20px auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-">
-        <h4 style="margin-top:0; font-weight: bold; color: #b45309;">📝 วิธีเล่น</h4>
-        <p style="font-size: 1.1rem; margin-bottom: 8px;">เติมตัวเลขที่หายไปในลำดับให้ถูกต้อง ตอบถูกครบทั้ง <strong>5
-                ข้อ</strong> จึงจะผ่านด่านนี้ได้</p>
-        <p style="font-size: 1rem; color: #92400e;">
-            ใช้ทักษะการสังเกตและคิดเป็นขั้นตอนนะ!</p>
+    <div id="instruction-box" class="alert alert-warning" style="max-width: 700px; margin: 20px auto 0;">
+        <h4 style="margin-top:0; font-weight: bold;">📝 วิธีเล่น</h4>
+        <p style="font-size: 1.1rem; margin-bottom: 0;">
+            เติมตัวเลขที่หายไปในลำดับให้ถูกต้อง ตอบถูกครบทุกข้อเพื่อผ่านด่าน!
+        </p>
     </div>
 
-    <div id="game-container" class="mt-3"></div>
+    <!-- ✅✅✅ แก้ไข: แยกโครงสร้างใหม่ให้ชัดเจน ✅✅✅ -->
+    <div id="game-wrapper" class="mt-3">
+        <!-- ส่วนสำหรับแสดงโจทย์ จะถูกสร้างโดย JavaScript -->
+        <div id="problem-container"></div>
 
-    <div id="feedback-popup"></div>
-
-    <footer>
-        <div>
-            <p class="mb-1">พัฒนาระบบโดย <strong>นายณัฐดนัย สุวรรณไตรย์</strong><br>ครู โรงเรียนบ้านนาอุดม</p>
-            <p class="text-muted mb-0">&copy; <?= date("Y") ?> Developed by Mr. Natdanai Suwannatrai</p>
+        <!-- ส่วนสำหรับแสดงหน้าต่างแจ้งเตือนตอนผ่านด่าน -->
+        <div id="win-overlay">
+            <div class="win-box">
+                <h2>✨ เก่งที่สุดเลย! ✨</h2>
+                <p>คุณผ่านด่านลำดับตัวเลขแล้ว</p>
+                <p>ได้รับ +100 คะแนน</p>
+            </div>
         </div>
-    </footer>
+    </div>
 
-    <?php /*
-    // ✅ ยังคง PHP POST block ไว้ในไฟล์นี้ตามที่ผู้ใช้ให้มา
-    // หากมีการย้ายไป submit_stage_score.php แล้ว สามารถลบส่วนนี้ได้
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $score = (int) $_POST['score'];
-        $completed_at = ($score === 100) ? date('Y-m-d H:i:s') : null;
 
-        $stmt = $conn->prepare("INSERT INTO progress (user_id, stage_id, score, attempts, completed_at)
-        VALUES (?, ?, ?, 1, ?)
-        ON DUPLICATE KEY UPDATE
-        score = VALUES(score),
-        attempts = attempts + 1,
-        completed_at = VALUES(completed_at)");
-        $stmt->bind_param("iiis", $user_id, $stage_id, $score, $completed_at);
-        $stmt->execute();
-        $stmt->close();
+    <?php include '../includes/student_footer.php'; ?>
 
-        $action = ($score === 100) ? 'pass' : 'fail';
-        $detail = json_encode(['score' => $score]);
-        $stmt = $conn->prepare("INSERT INTO game_logs (user_id, stage_id, action, detail) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("iiss", $user_id, $stage_id, $action, $detail);
-        $stmt->execute();
-        $stmt->close();
-        exit;
-    }
-        */
-    ?>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+    <script>
+        const USER_ID = <?= $user_id ?>;
+        const STAGE_ID = <?= $stage_id ?>;
+    </script>
+    <script src="../assets/js/shared/game_common.js"></script>
+    <script src="../assets/js/logic_game/stage3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

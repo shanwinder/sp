@@ -6,8 +6,9 @@
     <title>ยินดีต้อนรับ - ระบบแบบฝึกทักษะ ป.4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
 
     <style>
@@ -24,7 +25,8 @@
             text-align: center;
             overflow-x: hidden;
             /* เพิ่ม padding-bottom เพื่อไม่ให้เนื้อหาถูก footer บัง */
-            padding-bottom: 80px; /* กำหนดเผื่อความสูงของ footer */
+            padding-bottom: 80px;
+            /* กำหนดเผื่อความสูงของ footer */
         }
 
 
@@ -61,7 +63,8 @@
             border: 4px dashed #ffd166;
             position: relative;
             animation: fadeInUp 1s ease;
-            z-index: 1; /* ตรวจสอบให้แน่ใจว่าอยู่เหนือพื้นหลัง */
+            z-index: 1;
+            /* ตรวจสอบให้แน่ใจว่าอยู่เหนือพื้นหลัง */
             margin-bottom: 12rem;
         }
 
@@ -164,7 +167,8 @@
             font-size: 2rem;
             animation: flyRotate 10s linear infinite;
             opacity: 0.8;
-            z-index: 2; /* ให้อีโมจิอยู่เหนือกล่อง welcome */
+            z-index: 2;
+            /* ให้อีโมจิอยู่เหนือกล่อง welcome */
         }
 
         @keyframes flyRotate {
@@ -208,24 +212,31 @@
 
         /* --- Footer Styles --- */
         footer {
-            position: fixed; /* เปลี่ยนเป็น fixed */
-            bottom: 0; /* ตรึงไว้ที่ด้านล่าง */
+            position: fixed;
+            /* เปลี่ยนเป็น fixed */
+            bottom: 0;
+            /* ตรึงไว้ที่ด้านล่าง */
             left: 0;
             width: 100%;
             padding: 15px 10px;
             text-align: center;
             background: rgba(255, 255, 255, 0.75);
             box-sizing: border-box;
-            z-index: 10; /* ให้ footer อยู่ด้านบนสุด */
-            margin-top: 0; /* ลบ margin-top เดิมออก */
+            z-index: 10;
+            /* ให้ footer อยู่ด้านบนสุด */
+            margin-top: 0;
+            /* ลบ margin-top เดิมออก */
         }
 
         footer div {
-            max-width: 1000px; /* เพิ่ม max-width ให้เท่ากับในหน้า login */
+            max-width: 1000px;
+            /* เพิ่ม max-width ให้เท่ากับในหน้า login */
             margin: auto;
             font-size: 0.9rem;
-            border-radius: 0; /* ลบ border-radius ออกเพื่อให้แนบชิดขอบ */
+            border-radius: 0;
+            /* ลบ border-radius ออกเพื่อให้แนบชิดขอบ */
         }
+
         /* --- End Footer Styles --- */
 
         @media (max-width: 768px) {
@@ -290,7 +301,9 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
