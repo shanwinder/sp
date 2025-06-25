@@ -1,16 +1,21 @@
-// File: assets/js/logic_game/stage1.js (ฉบับ Responsive)
+// File: assets/js/logic_game/stage1.js (ฉบับแก้ไขการเลื่อนเมาส์)
 
 (function() {
     document.addEventListener('DOMContentLoaded', function() {
 
         const config = {
             type: Phaser.AUTO,
-            // ✅✅✅ ส่วนที่แก้ไข: เพิ่ม Scale Manager Configuration ✅✅✅
             scale: {
-                mode: Phaser.Scale.FIT, // ปรับขนาดให้พอดีกับพื้นที่ โดยรักษาสัดส่วน
-                autoCenter: Phaser.Scale.CENTER_BOTH, // จัดเกมให้อยู่กึ่งกลางเสมอ
-                width: 900, // กำหนดความกว้างพื้นฐาน
-                height: 600 // กำหนดความสูงพื้นฐาน
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 900,
+                height: 600
+            },
+            // ✅✅✅ ส่วนที่เพิ่มเข้ามาเพื่อแก้ปัญหาการเลื่อนสกอลล์ ✅✅✅
+            input: {
+                mouse: {
+                    preventDefaultWheel: false
+                }
             },
             parent: "game-container",
             scene: {
@@ -30,10 +35,9 @@
         function create() {
             const scene = this;
 
-            // ✅ ไม่ต้องแก้ไขโค้ดส่วนที่เหลือเลย เพราะ Scale Manager จะย่อส่วนทุกอย่างให้เอง
             const graphics = scene.add.graphics();
             graphics.fillGradientStyle(0x87CEEB, 0x87CEEB, 0x98FB98, 0x98FB98, 1);
-            graphics.fillRect(0, 0, config.scale.width, config.scale.height); // ใช้ขนาดจาก config
+            graphics.fillRect(0, 0, config.scale.width, config.scale.height);
             graphics.setDepth(-2);
             
             const puzzleZoneBg = scene.add.graphics();
