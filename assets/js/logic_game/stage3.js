@@ -1,42 +1,41 @@
 // File: assets/js/logic_game/stage3.js
-
-// ลบ: window.addEventListener('DOMContentLoaded', ...) ที่โหลดคะแนนเริ่มต้น เพราะ game_common.js จัดการให้
-// ลบ: fetch('../api/get_total_score.php')... ด้านล่าง เพราะ game_common.js จัดการให้
-
 window.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('game-container');
 
     const problems = [
-        { sequence: [1, 2, null, 4], answer: 3 }, // ง่าย
-        { sequence: [2, 4, null, 8], answer: 6 }, // คูณด้วย 2
-        { sequence: [5, 10, null, 20], answer: 15 }, // บวก 5
-        { sequence: [1, 3, null, 7], answer: 5 }, // บวกทีละ 2
-        { sequence: [10, 8, null, 4], answer: 6 } // ลบทีละ 2
+        { sequence: [1, 2, null, 4], answer: 3 },
+        { sequence: [2, 4, null, 8], answer: 6 },
+        { sequence: [5, 10, null, 20], answer: 15 },
+        { sequence: [1, 3, null, 7], answer: 5 },
+        { sequence: [10, 8, null, 4], answer: 6 }
     ];
-
     let current = 0;
+    let stageCompleted = false; // ป้องกันการส่งข้อมูลซ้ำ
 
     const showProblem = () => {
+        if (current >= problems.length) return;
         const p = problems[current];
         container.innerHTML = `
         <div class="game-box text-center p-4">
-            <h3 style="font-size: 1.8rem;">เติมตัวเลขที่หายไป</h3>
-            <p style="font-size: 2rem;">
-            ${p.sequence.map(n => n === null ? '<input id="ans" class="form-control d-inline" style="width:90px; display:inline; font-size:1.8rem;" />' : n).join(' , ')}
-            </p>
+            <h3 style="font-size: 1.8rem;">เติมตัวเลขที่หายไป (ข้อที่ ${current + 1}/${problems.length})</h3>
+            <div style="font-size: 2rem; display: flex; justify-content: center; align-items: center; gap: 10px;">
+            ${p.sequence.map(n => n === null ? '<input id="ans" type="number" class="form-control d-inline text-center" style="width:100px; font-size:1.8rem;" autofocus />' : `<span>${n}</span>`).join('<span>,</span>')}
+            </div>
             <button class="btn btn-success mt-3" onclick="checkAnswer()" style="font-size: 1.2rem;">ตรวจคำตอบ</button>
         </div>
         `;
+        document.getElementById('ans').focus();
     };
 
     window.checkAnswer = () => {
         const input = document.getElementById('ans');
         const val = parseInt(input.value);
-        if (val === problems[current].answer) {
+
+        if (!isNaN(val) && val === problems[current].answer) {
             current++;
             if (current >= problems.length) {
                 showPopup("✅ คุณผ่านด่านแล้ว!");
-                sendResult(100);
+                sendResult(100); // ส่งผลเมื่อผ่านด่าน
                 return;
             }
             showPopup("🎉 ถูกต้อง! ไปข้อต่อไป");
@@ -53,6 +52,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const popup = document.getElementById('feedback-popup');
         popup.innerHTML = msg;
         popup.style.display = 'block';
+        setTimeout(hidePopup, 2000);
     }
 
     function hidePopup() {
@@ -61,23 +61,26 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendResult(score) {
-        // อัปเดต URL ไปยัง submit_stage_score.php
-        return fetch('../api/submit_stage_score.php', {
+        if (stageCompleted) return; // ถ้าเคยส่งแล้ว ไม่ต้องส่งซ้ำ
+        stageCompleted = true;
+
+        fetch('../api/submit_stage_score.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `stage_id=${STAGE_ID}&score=${score}`
         }).then(() => {
-            // เรียก updateScoreBar ที่รวมศูนย์ใน game_common.js
             if (typeof window.updateScoreBar === 'function') {
                 window.updateScoreBar();
             }
         }).then(() => {
             setTimeout(() => {
-                // เรียก triggerAutoNextStage ที่รวมศูนย์ใน game_common.js
                 if (window.triggerAutoNextStage) {
                     window.triggerAutoNextStage();
                 }
             }, 300);
+        }).catch(error => {
+            console.error('Error sending score:', error);
+            stageCompleted = false; // หากเกิดข้อผิดพลาด ให้ลองส่งใหม่ได้
         });
     }
 

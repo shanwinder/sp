@@ -39,9 +39,12 @@ $next_stage_link = "stage_logic_3.php";
 
         #game-container {
             width: 100%;
-            max-width: 600px;
-            height: 600px;
+            max-width: 500px;
+            /* ปรับ max-width ให้เท่ากับความกว้างของเกม */
             margin: 20px auto;
+            display: flex;
+            /* เพิ่ม display flex เพื่อให้ container พอดีกับเกม */
+            justify-content: center;
         }
 
         #feedback-popup {
