@@ -7,7 +7,7 @@ require_once '../includes/db.php';
 $user_id = $_SESSION['user_id'];
 $stage_id = 3;
 $game_title = "เติมลำดับตัวเลข";
-$next_stage_link = "stage_logic_4.php"; // หรือด่านถัดไป
+$next_stage_link = "student_dashboard.php"; // หรือด่านถัดไป
 
 ?>
 
