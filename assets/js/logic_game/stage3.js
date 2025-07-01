@@ -1,113 +1,156 @@
-// File: assets/js/logic_game/stage3.js (ฉบับแก้ไขโครงสร้างสมบูรณ์)
+// File: assets/js/logic_game/stage3.js (ฉบับแก้ไขสมบูรณ์และสวยงาม)
 
-document.addEventListener('DOMContentLoaded', () => {
-    const problemContainer = document.getElementById('problem-container');
-    const winOverlay = document.getElementById('win-overlay');
+(function () {
+    // ฟังก์ชันนี้จะทำงานเมื่อหน้าเว็บโหลดเสร็จสมบูรณ์
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        // --- 1. การตั้งค่าพื้นฐานของเกม (Phaser Config) ---
+        const config = {
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 700,
+                height: 200 // ลดความสูงลง เพราะเราจะแสดงแค่โจทย์ใน canvas
+            },
+            parent: "game-container",
+            backgroundColor: '#ffffff', // ทำให้พื้นหลังโปร่งใสเพื่อให้เข้ากับหน้าเว็บ
+            scene: {
+                preload: preload,
+                create: create
+            }
+        };
 
-    const problems = [
-        { sequence: [1, 2, null, 4], answer: 3 },
-        { sequence: [2, 4, null, 8], answer: 6 },
-        { sequence: [5, 10, null, 20], answer: 15 },
-        { sequence: [1, 3, null, 7], answer: 5 },
-        { sequence: [10, 8, null, 4], answer: 6 }
-    ];
+        // --- 2. ข้อมูลโจทย์และตัวแปรของเกม ---
+        const problems = [
+            { sequence: [1, 2, '?', 4], answer: 3 },
+            { sequence: [2, 4, '?', 8], answer: 6 },
+            { sequence: [5, 10, '?', 20], answer: 15 },
+            { sequence: [10, 8, '?', 4], answer: 6 },
+            { sequence: [3, 6, 9, '?'], answer: 12 }
+        ];
 
-    let current = 0;
-    let stageCompleted = false;
+        let currentProblemIndex = 0; // ตัวแปรเก็บดัชนีของโจทย์ข้อปัจจุบัน
+        let gameScene; // ตัวแปรสำหรับเก็บ scene ของเกม เพื่อให้เรียกใช้ได้จากทุกที่
+        let problemTextObjects = []; // массив для хранения текстовых объектов текущей задачи
+        const game = new Phaser.Game(config); // สร้างเกม
 
-    // ✅✅✅ สร้าง Object กลางสำหรับฟังก์ชันของเกม ✅✅✅
-    // เพื่อให้ HTML onclick สามารถเรียกใช้ได้อย่างถูกต้องเสมอ
-    window.gameLogic = {
-        checkAnswer: function () {
-            const input = document.getElementById('ans');
-            if (!input) return;
+        // --- 3. ดึงองค์ประกอบ HTML มาเก็บในตัวแปร ---
+        const answerInput = document.getElementById('answer-input');
+        const checkButton = document.getElementById('check-button');
+        const feedbackText = document.getElementById('feedback-text');
 
-            const val = parseInt(input.value);
-            if (!isNaN(val) && val === problems[current].answer) {
-                current++;
-                if (current >= problems.length) {
-                    this.showWinAnimation();
+        // --- 4. ฟังก์ชันของ Phaser ---
+        function preload() {
+            // โหลดเสียงที่จำเป็น
+            this.load.audio('correct_sound', '../assets/sound/correct.mp3');
+            this.load.audio('wrong_sound', '../assets/sound/wrong.mp3');
+        }
+
+        function create() {
+            gameScene = this; // กำหนดค่า scene ปัจจุบัน
+            // แสดงโจทย์ข้อแรก
+            displayCurrentProblem();
+        }
+
+        // --- 5. ฟังก์ชันควบคุมตรรกะของเกม ---
+        
+        // ฟังก์ชันแสดงโจทย์ปัจจุบันใน canvas
+        function displayCurrentProblem() {
+            // ล้างโจทย์เก่าออกก่อน
+            problemTextObjects.forEach(text => text.destroy());
+            problemTextObjects = [];
+
+            const problem = problems[currentProblemIndex];
+            const yPos = config.scale.height / 2; // จัดให้อยู่กึ่งกลางแนวตั้ง
+            const spacing = config.scale.width / (problem.sequence.length + 1); //คำนวณระยะห่างอัตโนมัติ
+
+            // วนลูปเพื่อสร้างตัวเลขแต่ละตัวในโจทย์
+            problem.sequence.forEach((item, index) => {
+                const text = gameScene.add.text(spacing * (index + 1), yPos, item, {
+                    fontSize: '64px', // ตัวเลขใหญ่ๆ
+                    color: item === '?' ? '#ff6f61' : '#0d6efd', // ทำให้เครื่องหมาย '?' มีสีเด่น
+                    fontFamily: 'Kanit, sans-serif',
+                    fontWeight: 'bold',
+                    stroke: '#ffffff',
+                    strokeThickness: 6
+                }).setOrigin(0.5);
+
+                problemTextObjects.push(text);
+            });
+        }
+
+        // ฟังก์ชันตรวจคำตอบ
+        function handleCheckAnswer() {
+            if (answerInput.value === '') return; // ไม่ทำอะไรถ้าช่องว่าง
+
+            const userAnswer = parseInt(answerInput.value, 10);
+            const correctAnswer = problems[currentProblemIndex].answer;
+
+            if (userAnswer === correctAnswer) {
+                // กรณีตอบถูก
+                gameScene.sound.play('correct_sound');
+                feedbackText.textContent = '🎉 ถูกต้องครับ เก่งมาก!';
+                feedbackText.className = 'mt-3 text-success';
+                
+                currentProblemIndex++; // เลื่อนไปโจทย์ข้อถัดไป
+
+                if (currentProblemIndex >= problems.length) {
+                    // ถ้าทำครบทุกข้อแล้ว -> ชนะ
+                    setTimeout(handleWin, 1000);
                 } else {
-                    this.showPopup("🎉 ถูกต้อง! ไปข้อต่อไป");
-                    setTimeout(this.showProblem, 1500);
+                    // ถ้ายังไม่ครบ -> แสดงโจทย์ข้อถัดไป
+                    setTimeout(() => {
+                        displayCurrentProblem();
+                        feedbackText.textContent = ''; // ล้างข้อความ feedback
+                    }, 1500);
                 }
             } else {
-                this.showPopup("❌ ผิด ลองอีกครั้ง");
-                input.focus();
-                input.select();
+                // กรณีตอบผิด
+                gameScene.sound.play('wrong_sound');
+                feedbackText.textContent = '❌ ยังไม่ถูกนะ ลองคิดดูอีกที!';
+                feedbackText.className = 'mt-3 text-danger';
+                gameScene.cameras.main.shake(150, 0.005); // เขย่าหน้าจอเบาๆ
             }
-        },
 
-        showProblem: function () {
-            if (stageCompleted) return;
-            const p = problems[current];
-            problemContainer.innerHTML = `
-            <div class="game-box text-center">
-                <h3 style="font-size: 1.8rem;">เติมตัวเลขที่หายไป (ข้อที่ ${current + 1}/${problems.length})</h3>
-                <div class="d-flex justify-content-center align-items-center gap-3 py-3" style="font-size: 2rem;">
-                ${p.sequence.map(n => n === null ? '<input id="ans" type="number" class="form-control d-inline text-center" style="width:100px; font-size:1.8rem;" autofocus />' : `<span>${n}</span>`).join('<span>,</span>')}
+            answerInput.value = ''; // ล้างช่องกรอกข้อมูล
+            answerInput.focus(); // ให้เคอร์เซอร์กลับไปที่ช่องกรอก
+        }
+
+        // ฟังก์ชันเมื่อผู้เล่นผ่านด่าน
+        function handleWin() {
+            // ซ่อนพื้นที่เกมและแสดงข้อความว่า "ชนะแล้ว"
+            document.getElementById('game-area').innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-success" style="font-size: 3rem;">✨ ยอดเยี่ยม! ✨</h2>
+                    <p class="lead" style="font-size: 1.5rem;">คุณผ่านด่านลำดับตัวเลขแล้ว<br>ได้รับ +100 คะแนน</p>
                 </div>
-                <button onclick="window.gameLogic.checkAnswer()" class="btn btn-success mt-2" style="font-size: 1.2rem;">ตรวจคำตอบ</button>
-            </div>
             `;
+            // ส่งคะแนนไปที่ server
+            sendResult(100);
+        }
 
-            const answerInput = document.getElementById('ans');
-            if (answerInput) {
-                answerInput.focus();
-                answerInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        window.gameLogic.checkAnswer();
-                    }
-                });
-            }
-        },
-
-        showPopup: function (msg) {
-            const tempPopup = document.createElement('div');
-            tempPopup.id = 'temp-feedback-popup';
-            tempPopup.style.position = 'fixed';
-            tempPopup.style.top = '20%';
-            tempPopup.style.left = '50%';
-            tempPopup.style.transform = 'translate(-50%, -50%)';
-            tempPopup.style.background = '#2c3e50';
-            tempPopup.style.color = 'white';
-            tempPopup.style.padding = '15px 25px';
-            tempPopup.style.borderRadius = '12px';
-            tempPopup.style.fontSize = '24px';
-            tempPopup.style.zIndex = '3000';
-            tempPopup.innerHTML = msg;
-            document.body.appendChild(tempPopup);
-            setTimeout(() => { tempPopup.remove(); }, 1500);
-        },
-
-        showWinAnimation: function () {
-            if (stageCompleted) return;
-            stageCompleted = true;
-
-            problemContainer.style.display = 'none';
-            winOverlay.classList.add('visible');
-
-            setTimeout(() => {
-                this.sendResult(100);
-            }, 500);
-        },
-
-        sendResult: function (score) {
+        // ฟังก์ชันส่งคะแนน
+        function sendResult(score) {
             fetch('../api/submit_stage_score.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `stage_id=${STAGE_ID}&score=${score}`
             }).then(() => {
-                if (typeof window.updateScoreBar === 'function') {
-                    window.updateScoreBar();
-                }
-                if (typeof window.triggerAutoNextStage === 'function') {
-                    window.triggerAutoNextStage();
-                }
+                if (typeof window.updateScoreBar === 'function') window.updateScoreBar();
+                if (typeof window.triggerAutoNextStage === 'function') window.triggerAutoNextStage();
             });
         }
-    };
 
-    // เริ่มเกมครั้งแรก
-    window.gameLogic.showProblem();
-});
+        // --- 6. การเชื่อมต่อเหตุการณ์ (Event Listeners) ---
+        checkButton.addEventListener('click', handleCheckAnswer);
+        answerInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleCheckAnswer();
+            }
+        });
+
+        // ให้เคอร์เซอร์ไปรอที่ช่องกรอกข้อมูลเมื่อหน้าเว็บพร้อม
+        answerInput.focus();
+    });
+})();
