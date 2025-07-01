@@ -7,6 +7,12 @@
             type: Phaser.AUTO,
             width: 500,
             height: 560,
+            // ✅✅✅ ส่วนที่เพิ่มเข้ามาเพื่อแก้ปัญหาการเลื่อนสกอลล์ ✅✅✅
+            input: {
+                mouse: {
+                    preventDefaultWheel: false
+                }
+            },
             parent: 'game-container',
             backgroundColor: '#f0f9ff',
             scene: {

@@ -2,15 +2,21 @@
 
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
-        
+
         const config = {
             type: Phaser.AUTO,
             scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH, width: 900, height: 600 },
+            // ✅✅✅ ส่วนที่เพิ่มเข้ามาเพื่อแก้ปัญหาการเลื่อนสกอลล์ ✅✅✅
+            input: {
+                mouse: {
+                    preventDefaultWheel: false
+                }
+            },
             parent: "game-container",
             dom: { createContainer: true },
             scene: { preload: preload, create: create }
         };
-        
+
         const problems = [
             { sequence: [1, 2, '?', 4], answer: 3 }, { sequence: [2, 4, '?', 8], answer: 6 },
             { sequence: [5, 10, '?', 20], answer: 15 }, { sequence: [10, 8, '?', 4], answer: 6 },
@@ -32,22 +38,22 @@
             const graphics = scene.add.graphics();
             graphics.fillGradientStyle(0xfef3c7, 0xfef3c7, 0xbae6fd, 0xbae6fd, 1);
             graphics.fillRect(0, 0, config.scale.width, config.scale.height);
-            
+
             const puzzleZoneBg = scene.add.graphics();
             puzzleZoneBg.fillStyle(0xfffbe6, 0.9).fillRoundedRect(25, 25, 850, 550, 20);
-            
+
             function renderProblem() {
                 if (stageCompleted) return;
                 if (problemGroup) problemGroup.destroy(true, true);
-                
+
                 problemGroup = scene.add.group();
                 const problem = problems[currentProblemIndex];
                 const spacing = 180;
                 const startX = (config.scale.width - (problem.sequence.length - 1) * spacing) / 2;
-                
+
                 const title = scene.add.text(config.scale.width / 2, 80, `โจทย์ข้อที่ ${currentProblemIndex + 1} / ${problems.length}`, { fontSize: '32px', color: '#1e3a8a', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
                 problemGroup.add(title);
-                
+
                 let inputElement;
 
                 problem.sequence.forEach((item, i) => {
@@ -62,36 +68,36 @@
                         problemGroup.add(numberText);
                     }
                     if (i < problem.sequence.length - 1) {
-                       const comma = scene.add.text(x + spacing / 2, y, ',', { fontSize: '80px', color: '#6b7280', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
-                       problemGroup.add(comma);
+                        const comma = scene.add.text(x + spacing / 2, y, ',', { fontSize: '80px', color: '#6b7280', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
+                        problemGroup.add(comma);
                     }
                 });
 
-                const checkButton = scene.add.text(config.scale.width / 2, 450, '✔️ ตรวจคำตอบ', { 
+                const checkButton = scene.add.text(config.scale.width / 2, 450, '✔️ ตรวจคำตอบ', {
                     fontSize: '28px', color: '#ffffff', backgroundColor: '#16a34a', padding: { x: 30, y: 15 }, borderRadius: 10
                 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
                 problemGroup.add(checkButton);
-                
+
                 checkButton.on('pointerdown', () => checkAnswer(inputElement));
-                
+
                 const inputNode = inputElement.node.querySelector('input');
                 setTimeout(() => inputNode.focus(), 100);
                 inputNode.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter') checkAnswer(inputElement);
                 });
             }
-            
+
             function checkAnswer(inputElement) {
                 if (isChecking) return;
                 isChecking = true;
-                
+
                 // ✅✅✅ จุดแก้ไขสำคัญที่ 1: ซ่อนช่องกรอกทันทีที่กดตรวจ ✅✅✅
-                inputElement.setVisible(false); 
+                inputElement.setVisible(false);
 
                 const inputNode = inputElement.node.querySelector('input');
                 const userAnswer = parseInt(inputNode.value);
                 const correctAnswer = problems[currentProblemIndex].answer;
-                
+
                 const onPopupComplete = (isCorrect) => {
                     if (isCorrect) {
                         currentProblemIndex++;
@@ -118,11 +124,11 @@
                     showFeedbackPopup(scene, "ลองอีกครั้งนะ", false, inputElement.x, inputElement.y, () => onPopupComplete(false));
                 }
             }
-            
+
             renderProblem();
         }
-        
-        function drawStar (graphics, cx, cy, spikes, outerRadius, innerRadius, color, lineColor) {
+
+        function drawStar(graphics, cx, cy, spikes, outerRadius, innerRadius, color, lineColor) {
             let rot = Math.PI / 2 * 3; let x = cx; let y = cy;
             const step = Math.PI / spikes;
             graphics.lineStyle(8, lineColor, 1); graphics.fillStyle(color, 1);
@@ -157,7 +163,7 @@
                 wordWrap: { width: 200, useAdvancedWrap: true }
             }).setOrigin(0.5);
             popupContainer.add([icon, text]);
-            
+
             scene.tweens.add({
                 targets: popupContainer, alpha: 1, scale: { from: 0.5, to: 1 }, duration: 400, ease: 'Bounce.easeOut',
                 onComplete: () => {
@@ -186,7 +192,7 @@
                 onComplete: () => { sendResult(100); }
             });
         }
-        
+
         function sendResult(score) {
             fetch('../api/submit_stage_score.php', {
                 method: 'POST',

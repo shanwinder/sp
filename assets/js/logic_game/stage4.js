@@ -11,6 +11,12 @@
                 width: 900,
                 height: 650
             },
+            // ✅✅✅ ส่วนที่เพิ่มเข้ามาเพื่อแก้ปัญหาการเลื่อนสกอลล์ ✅✅✅
+            input: {
+                mouse: {
+                    preventDefaultWheel: false
+                }
+            },
             parent: "game-container",
             scene: {
                 preload: preload,
