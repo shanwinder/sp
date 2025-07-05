@@ -41,7 +41,7 @@ window.animateScoreChange = function (current, target) {
  * @param {number} durationSeconds ระยะเวลาที่ใช้ในการเล่นด่าน (หน่วยเป็นวินาที)
  * @param {number} attempts จำนวนครั้งที่พยายามก่อนสำเร็จ
  */
-window.sendResult = function(stageId, starsEarned, durationSeconds = 0, attempts = 1) {
+window.sendResult = function (stageId, starsEarned, durationSeconds = 0, attempts = 1) {
     if (typeof stageId !== 'number' || typeof starsEarned !== 'number' || starsEarned < 0 || starsEarned > 3) {
         console.error('Invalid stageId or starsEarned provided to sendResult.');
         return;
@@ -53,80 +53,78 @@ window.sendResult = function(stageId, starsEarned, durationSeconds = 0, attempts
     formData.append('duration_seconds', durationSeconds);
     formData.append('attempts', attempts);
 
+    // ✅ Path ไปยังไฟล์ API ใน Backend ต้องถูกต้อง
     fetch('../api/submit_stage_score.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'ok') {
-            console.log('Score submitted successfully:', data.stars_saved, 'stars.');
-            window.updateTotalStarsAndAchievement();
-            window.triggerAutoNextStage();
-        } else {
-            console.error('Error submitting score:', data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Network error submitting score:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                console.log('Score submitted successfully:', data.stars_saved, 'stars.');
+                window.updateTotalStarsAndAchievement();
+                window.triggerAutoNextStage();
+            } else {
+                console.error('Error submitting score:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Network error submitting score:', error);
+        });
 };
 
 /**
  * ฟังก์ชันสำหรับดึงและอัปเดตคะแนนดาวรวมและฉายาปัจจุบันของนักเรียน
  * เรียกใช้เมื่อมีการโหลดหน้า Dashboard หรือเมื่อมีการส่งคะแนนด่านสำเร็จ
  */
-window.updateTotalStarsAndAchievement = function() {
+window.updateTotalStarsAndAchievement = function () {
+    // ✅ Path ไปยังไฟล์ API ใน Backend ต้องถูกต้อง
     fetch('../api/get_current_achievement.php')
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'error') {
-            console.error('Error fetching achievement:', data.message);
-            return;
-        }
-        
-        // อัปเดตคะแนนรวมดาวบน Header ของเกม
-        const scoreEl = document.getElementById('total-score');
-        if (scoreEl) {
-            const currentScore = parseInt(scoreEl.textContent) || 0;
-            window.animateScoreChange(currentScore, data.total_stars);
-        }
-
-        // อัปเดตฉายาบนหน้า Dashboard (element ที่มี id='current-achievement')
-        const achievementDashboardElement = document.getElementById('current-achievement'); 
-        if (achievementDashboardElement) {
-            achievementDashboardElement.textContent = data.current_title;
-            // ✅ แก้ไข: ตรวจสอบว่ามี data.current_title_class ก่อนที่จะกำหนด
-            if (data.current_title_class) { // ถ้ามีค่า ไม่ใช่ null หรือ empty string
-                // ลบ class เดิมออกก่อนเพื่อป้องกัน class ซ้อนกัน
-                achievementDashboardElement.className = ''; 
-                achievementDashboardElement.classList.add(data.current_title_class);
-            } else {
-                // ถ้าไม่มี class ให้ลบ class เดิมออก
-                achievementDashboardElement.className = '';
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'error') {
+                console.error('Error fetching achievement:', data.message);
+                return;
             }
-        }
 
-        // อัปเดตฉายาบน Header ขณะเล่นเกม (element ที่มี id='current-achievement-game-header')
-        const achievementGameHeaderElement = document.getElementById('current-achievement-game-header');
-        if (achievementGameHeaderElement) {
-            achievementGameHeaderElement.textContent = data.current_title;
-            // ✅ แก้ไข: ตรวจสอบว่ามี data.current_title_class ก่อนที่จะกำหนด
-            if (data.current_title_class) { // ถ้ามีค่า ไม่ใช่ null หรือ empty string
-                // ลบ class เดิมออกก่อนเพื่อป้องกัน class ซ้อนกัน
-                achievementGameHeaderElement.className = ''; 
-                achievementGameHeaderElement.classList.add(data.current_title_class);
-            } else {
-                // ถ้าไม่มี class ให้ลบ class เดิมออก
-                achievementGameHeaderElement.className = '';
+            // อัปเดตคะแนนรวมดาวบน Header ของเกม
+            const scoreEl = document.getElementById('total-score');
+            if (scoreEl) {
+                const currentScore = parseInt(scoreEl.textContent) || 0;
+                window.animateScoreChange(currentScore, data.total_stars);
             }
-        }
 
-        console.log('Total Stars:', data.total_stars, 'Current Title:', data.current_title, 'Class:', data.current_title_class);
-    })
-    .catch(error => {
-        console.error('Network error fetching achievement:', error);
-    });
+            // อัปเดตฉายาบนหน้า Dashboard (element ที่มี id='current-achievement')
+            const achievementDashboardElement = document.getElementById('current-achievement');
+            if (achievementDashboardElement) {
+                achievementDashboardElement.textContent = data.current_title;
+                // ✅ แก้ไข: ตรวจสอบว่ามี data.current_title_class ก่อนที่จะกำหนด
+                if (data.current_title_class) {
+                    achievementDashboardElement.className = ''; // ลบ class เดิมออกก่อน
+                    achievementDashboardElement.classList.add(data.current_title_class); // เพิ่ม class ใหม่
+                } else {
+                    achievementDashboardElement.className = ''; // ถ้าไม่มี class ก็ให้ว่างไว้
+                }
+            }
+
+            // อัปเดตฉายาบน Header ขณะเล่นเกม (element ที่มี id='current-achievement-game-header')
+            const achievementGameHeaderElement = document.getElementById('current-achievement-game-header');
+            if (achievementGameHeaderElement) {
+                achievementGameHeaderElement.textContent = data.current_title;
+                // ✅ แก้ไข: ตรวจสอบว่ามี data.current_title_class ก่อนที่จะกำหนด
+                if (data.current_title_class) {
+                    achievementGameHeaderElement.className = ''; // ลบ class เดิมออกก่อน
+                    achievementGameHeaderElement.classList.add(data.current_title_class); // เพิ่ม class ใหม่
+                } else {
+                    achievementGameHeaderElement.className = ''; // ถ้าไม่มี class ก็ให้ว่างไว้
+                }
+            }
+
+            console.log('Total Stars:', data.total_stars, 'Current Title:', data.current_title, 'Class:', data.current_title_class);
+        })
+        .catch(error => {
+            console.error('Network error fetching achievement:', error);
+        });
 };
 
 // ฟังก์ชันสำหรับอัปเดต Score Bar (ใช้เมื่อ DOM โหลดเสร็จ)
@@ -149,7 +147,7 @@ window.triggerAutoNextStage = function () {
 
     overlay.style.transition = 'none';
     overlay.style.width = '0%';
-    void overlay.offsetWidth; 
+    void overlay.offsetWidth;
 
     overlay.style.transition = 'width 10s linear';
     overlay.style.width = '100%';
