@@ -1,5 +1,5 @@
 <?php
-// File: includes/game_header.php (ฉบับแก้ไข Font)
+// File: includes/game_header.php (ฉบับปรับปรุงสำหรับแสดงฉายา)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -10,12 +10,9 @@ if (session_status() === PHP_SESSION_NONE) {
 // }
 ?>
 
-<!-- ✅✅✅ ส่วนที่เพิ่มเข้ามา ✅✅✅ -->
-<!-- 1. โหลดฟอนต์ Kanit จาก Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap" rel="stylesheet">
-<!-- ✅✅✅ จบส่วนที่เพิ่ม ✅✅✅ -->
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/game_header.css">
@@ -25,7 +22,8 @@ if (session_status() === PHP_SESSION_NONE) {
         👦 ผู้เล่น: <strong><?= $_SESSION['name'] ?? 'ทดสอบ' ?></strong> |
         🧩 เกม: <strong><?= $game_title ?? 'ไม่ระบุเกม' ?></strong> |
         🧠 ด่านที่: <strong><?= $stage_id ?? 'N/A' ?></strong> |
-        🌟 คะแนนรวม: <strong id="total-score">0</strong>
+        🌟 ดาวรวม: <strong id="total-score">0</strong> |
+        ✨ ฉายา: <strong id="current-achievement-game-header">นักเรียนเริ่มต้น</strong> 
     </div>
 
     <div class="top-bar-buttons">

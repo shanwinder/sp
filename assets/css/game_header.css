@@ -1,92 +1,401 @@
 /* File: assets/css/game_header.css */
 #top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #fffbe6;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    border-bottom: 2px solid #fcd34d;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
-    z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fffbe6;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #fcd34d;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+  z-index: 999;
 }
 
+/* File: assets/css/game_header.css */
+
+/* ... (โค้ด CSS เดิมทั้งหมด รวมถึง .info-text, #top-bar, @keyframes สำหรับ score-animate) ... */
+
+/* ✅ ส่วนเพิ่มสำหรับ Style ฉายาแต่ละระดับ (Achievement Classes) ✅ */
+
+/* Style พื้นฐานสำหรับฉายาบน Header และ Dashboard */
+/* เพื่อให้มั่นใจว่า Element ของฉายาจะมีพื้นฐาน Style ที่ถูกต้องก่อนที่จะรับ class เฉพาะ */
+#current-achievement-game-header,
+#current-achievement {
+  /* id สำหรับฉายาบน Dashboard */
+  font-weight: bold; /* ทำให้ตัวหนาขึ้น */
+  transition: all 0.5s ease-in-out; /* เพิ่ม transition เพื่อให้การเปลี่ยน class ดูนุ่มนวล */
+  /* กำหนดค่าเริ่มต้นเพื่อป้องกัน style ซ้อนทับ หรือ เพื่อให้มีค่าที่แน่นอน */
+  text-shadow: none;
+  animation: none;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: unset;
+  color: inherit; /* ให้สีเป็นไปตามที่ class กำหนด */
+  font-size: 0.95rem; /* ขนาดเริ่มต้นเท่ากับ .info-text */
+}
+
+/* --- ระดับ 1: นักคิดเริ่มต้น (Min Stars: 1) --- */
+.achievement-level-1 {
+  color: #8bc34a; /* สีเขียวอ่อน สื่อถึงการเริ่มต้น */
+  text-shadow: 0 0 2px rgba(139, 195, 74, 0.5); /* เงาเบาๆ */
+}
+
+/* --- ระดับ 2: นักคิดตรรกะ (Min Stars: 15) --- */
+.achievement-level-2 {
+  color: #2196f3; /* สีฟ้าสดใส */
+  text-shadow: 0 0 3px #2196f3, 0 0 6px rgba(33, 150, 243, 0.6);
+}
+
+/* --- ระดับ 3: ผู้เชี่ยวชาญเหตุผล (Min Stars: 30) --- */
+.achievement-level-3 {
+  color: #ffc107; /* สีส้มทองอ่อนๆ */
+  text-shadow: 0 0 4px #ffc107, 0 0 8px rgba(255, 193, 7, 0.7);
+}
+
+/* --- ระดับ 4: นักสร้างคำสั่ง (Min Stars: 45) --- */
+.achievement-level-4 {
+  color: #9c27b0; /* สีม่วง */
+  text-shadow: 0 0 5px #9c27b0, 0 0 10px rgba(156, 39, 176, 0.8);
+  font-size: 1rem; /* เพิ่มขนาดขึ้นเล็กน้อย */
+}
+
+/* --- ระดับ 5: ผู้ควบคุมหุ่นยนต์ (Min Stars: 55) --- */
+.achievement-level-5 {
+  color: #ff5722; /* สีส้มแดง */
+  text-shadow: 0 0 6px #ff5722, 0 0 12px rgba(255, 87, 34, 0.9);
+  font-size: 1rem;
+}
+
+/* --- ระดับ 6: ยอดนักวางแผน (Min Stars: 60) --- */
+.achievement-level-6 {
+  color: #00bcd4; /* สีฟ้าอมเขียว (Cyan) */
+  text-shadow: 0 0 7px #00bcd4, 0 0 14px rgba(0, 188, 212, 1),
+    0 0 20px rgba(0, 188, 212, 0.6);
+  font-size: 1.05rem;
+  animation: achievement-glow-cyan 1.8s ease-in-out infinite alternate;
+}
+@keyframes achievement-glow-cyan {
+  from {
+    text-shadow: 0 0 7px #00bcd4, 0 0 14px rgba(0, 188, 212, 1);
+  }
+  to {
+    text-shadow: 0 0 10px #b2ebf2, 0 0 18px rgba(178, 235, 242, 1),
+      0 0 25px rgba(178, 235, 242, 0.8);
+  }
+}
+
+/* --- ระดับ 7: นักเขียนโค้ดจิ๋ว (Min Stars: 75) --- */
+.achievement-level-7 {
+  color: #ffd700; /* สีทองสดใส */
+  text-shadow: 0 0 8px #ffd700, 0 0 16px rgba(255, 215, 0, 0.9),
+    0 0 25px rgba(255, 215, 0, 0.5);
+  font-size: 1.05rem;
+  animation: achievement-glow-gold 1.5s ease-in-out infinite alternate;
+}
+@keyframes achievement-glow-gold {
+  from {
+    text-shadow: 0 0 8px #ffd700, 0 0 16px rgba(255, 215, 0, 0.9);
+  }
+  to {
+    text-shadow: 0 0 12px #ffff00, 0 0 22px rgba(255, 255, 0, 1),
+      0 0 30px rgba(255, 255, 0, 0.7);
+  }
+}
+
+/* --- ระดับ 8: นักแก้ปัญหาด้วยภาษา (Min Stars: 85) --- */
+.achievement-level-8 {
+  color: #8bc34a; /* เขียว */
+  text-shadow: 0 0 10px #8bc34a, 0 0 20px rgba(139, 195, 74, 1),
+    0 0 30px rgba(139, 195, 74, 0.7);
+  font-size: 1.1rem;
+  animation: achievement-pulse-green 2s ease-out infinite alternate;
+}
+@keyframes achievement-pulse-green {
+  from {
+    text-shadow: 0 0 10px #8bc34a, 0 0 20px rgba(139, 195, 74, 1);
+  }
+  to {
+    text-shadow: 0 0 15px #dcedc8, 0 0 28px rgba(220, 237, 200, 1),
+      0 0 40px rgba(220, 237, 200, 0.8);
+  }
+}
+
+/* --- ระดับ 9: ปรมาจารย์รหัสจำลอง (Min Stars: 90) --- */
+.achievement-level-9 {
+  color: #ff5252; /* สีแดงสด */
+  text-shadow: 0 0 12px #ff5252, 0 0 25px rgba(255, 82, 82, 1),
+    0 0 40px rgba(255, 82, 82, 0.8);
+  font-size: 1.15rem;
+  animation: achievement-flame 1.2s ease-in-out infinite alternate; /* เอฟเฟกต์เปลวไฟ */
+}
+@keyframes achievement-flame {
+  0% {
+    text-shadow: 0 0 12px #ff5252, 0 0 25px rgba(255, 82, 82, 1);
+  }
+  50% {
+    text-shadow: 0 0 15px #ffcc80, 0 0 30px rgba(255, 204, 128, 1);
+  } /* สีส้มอ่อน */
+  100% {
+    text-shadow: 0 0 12px #ff5252, 0 0 25px rgba(255, 82, 82, 1);
+  }
+}
+
+/* --- ระดับ 10: นักออกแบบผังความคิด (Min Stars: 105) --- */
+.achievement-level-10 {
+  color: #e040fb; /* สีม่วงอมชมพูสดใส */
+  font-size: 1.15rem;
+  text-shadow: 0 0 15px #e040fb, 0 0 30px rgba(224, 64, 251, 1),
+    0 0 50px rgba(224, 64, 251, 0.7);
+  animation: achievement-cosmic-glow 3s linear infinite; /* แสงเรืองรองจักรวาล */
+  background: linear-gradient(
+    45deg,
+    #e040fb,
+    #7c4dff,
+    #e040fb
+  ); /* ไล่สีม่วงน้ำเงิน */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes achievement-cosmic-glow {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* --- ระดับ 11: จอมวิเคราะห์ผังงาน (Min Stars: 115) --- */
+.achievement-level-11 {
+  color: #76ff03; /* สีเขียวมะนาวสดใส */
+  font-size: 1.2rem;
+  text-shadow: 0 0 18px #76ff03, 0 0 35px rgba(118, 255, 3, 1),
+    0 0 60px rgba(118, 255, 3, 0.8);
+  animation: achievement-sparkle-green 1.5s ease-in-out infinite alternate;
+}
+@keyframes achievement-sparkle-green {
+  from {
+    text-shadow: 0 0 18px #76ff03, 0 0 35px rgba(118, 255, 3, 1);
+  }
+  to {
+    text-shadow: 0 0 25px #b2ff59, 0 0 45px rgba(178, 255, 89, 1),
+      0 0 70px rgba(178, 255, 89, 0.9);
+  }
+}
+
+/* --- ระดับ 12: จอมวางแผนผังงาน (Min Stars: 120) --- */
+.achievement-level-12 {
+  color: #6200ea; /* สีม่วงเข้ม */
+  font-size: 1.25rem;
+  text-shadow: 0 0 20px #6200ea, 0 0 40px rgba(98, 0, 234, 1),
+    0 0 70px rgba(98, 0, 234, 0.7), 0 0 100px rgba(98, 0, 234, 0.5); /* ฟุ้งกระจายมาก */
+  animation: achievement-deep-purple 2.5s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    #6200ea,
+    #ff4081,
+    #6200ea
+  ); /* ไล่สีม่วงชมพู */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes achievement-deep-purple {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* --- ระดับ 13: โค้ดดิ้งฮีโร่ (Min Stars: 135) --- */
+.achievement-level-13 {
+  color: #ffeb3b; /* สีเหลืองทองสว่าง */
+  font-size: 1.3rem;
+  text-shadow: 0 0 25px #ffeb3b, 0 0 50px rgba(255, 235, 59, 1),
+    0 0 80px rgba(255, 235, 59, 0.8), 0 0 120px rgba(255, 235, 59, 0.6); /* ฟุ้งและสว่างจัด */
+  animation: achievement-hero-glow 1.5s ease-in-out infinite alternate;
+  background: linear-gradient(
+    45deg,
+    #ffd700,
+    #ffa000,
+    #ffd700
+  ); /* ไล่สีทอง-ส้ม */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes achievement-hero-glow {
+  from {
+    text-shadow: 0 0 25px #ffeb3b, 0 0 50px rgba(255, 235, 59, 1);
+  }
+  to {
+    text-shadow: 0 0 35px #ffeb3b, 0 0 65px rgba(255, 235, 59, 1),
+      0 0 90px rgba(255, 235, 59, 0.9);
+  }
+}
+
+/* --- ระดับ 14: สุดยอดนักประดิษฐ์ดิจิทัล (Min Stars: 145) --- */
+.achievement-level-14 {
+  color: #f44336; /* สีแดงเพลิง */
+  font-size: 1.35rem;
+  text-shadow: 0 0 30px #f44336, 0 0 60px rgba(244, 67, 54, 1),
+    0 0 90px rgba(244, 67, 54, 0.8), 0 0 130px rgba(244, 67, 54, 0.6); /* ฟุ้งและเข้มข้นดุจไฟ */
+  animation: achievement-ultimate-fire 2s linear infinite; /* เปลวไฟรุนแรง */
+  background: linear-gradient(
+    45deg,
+    #ffd700,
+    #ff5722,
+    #f44336
+  ); /* ไล่สีไฟร้อนแรง */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes ultimate-fire {
+  /* ใช้ชื่อนี้ตามที่เคยกำหนด */
+  0% {
+    text-shadow: 0 0 30px #f44336, 0 0 60px rgba(244, 67, 54, 1);
+  }
+  25% {
+    text-shadow: 0 0 35px #ff9800, 0 0 70px rgba(255, 152, 0, 1);
+  } /* ส้ม */
+  50% {
+    text-shadow: 0 0 40px #ffc107, 0 0 80px rgba(255, 193, 7, 1);
+  } /* เหลือง */
+  75% {
+    text-shadow: 0 0 35px #ff9800, 0 0 70px rgba(255, 152, 0, 1);
+  }
+  100% {
+    text-shadow: 0 0 30px #f44336, 0 0 60px rgba(244, 67, 54, 1);
+  }
+}
+
+/* --- ระดับ 15: ครูคอมพิวเตอร์น้อย (Min Stars: 150) --- */
+.achievement-level-15 {
+  color: #ffffff; /* สีขาวบริสุทธิ์ */
+  font-size: 1.4rem; /* ใหญ่และเด่นที่สุด */
+  font-weight: 900; /* หนาสุดๆ */
+  text-shadow: 0 0 25px #ffffff, 0 0 50px rgba(255, 255, 255, 1),
+    0 0 80px rgba(128, 0, 128, 0.8),
+    /* เพิ่มสีม่วง/น้ำเงินเพื่อความหลากหลาย */ 0 0 120px rgba(0, 255, 255, 0.6); /* สีฟ้า */
+  animation: achievement-rainbow-master 3s linear infinite,
+    achievement-final-pulse 1.5s ease-in-out infinite alternate;
+  /* ไล่สีรุ้งในตัวอักษรเพื่อความอลังการสูงสุด */
+  background: linear-gradient(
+    to right,
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    indigo,
+    violet
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@keyframes achievement-rainbow-master {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+@keyframes achievement-final-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* ... (โค้ด CSS เดิมที่เหลือทั้งหมด) ... */
+
 .info-text {
-    font-size: 0.95rem;
-    color: #4b5563;
+  font-size: 0.95rem;
+  color: #4b5563;
 }
 
 .top-bar-buttons {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .btn-dashboard,
 .btn-next-stage {
-    position: relative;
-    padding: 6px 14px;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    border: none;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
+  position: relative;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .btn-dashboard {
-    background-color: #60a5fa;
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #60a5fa;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-dashboard:hover {
-    background-color: #3b82f6;
+  background-color: #3b82f6;
 }
 
 .btn-next-stage {
-    background-color: rgb(0, 189, 120);
-    color: white;
-    display: none;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  background-color: rgb(0, 189, 120);
+  color: white;
+  display: none;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .btn-next-stage:hover {
-    background-color: rgb(14, 155, 108);
+  background-color: rgb(14, 155, 108);
 }
 
 .btn-next-stage .progress-bar-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    width: 100%;
-    transition: width 1s linear;
-    z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  transition: width 1s linear;
+  z-index: 1;
 }
 
 .btn-next-stage .btn-text {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 @media (max-width: 576px) {
-    #top-bar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
+  #top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 
-    .top-bar-buttons {
-        flex-wrap: wrap;
-    }
+  .top-bar-buttons {
+    flex-wrap: wrap;
+  }
 }

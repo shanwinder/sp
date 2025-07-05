@@ -103,3 +103,28 @@ CREATE TABLE `student_assessment_answers` (
   FOREIGN KEY (`result_id`) REFERENCES `assessment_results`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`question_id`) REFERENCES `assessment_questions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `titles` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,          -- ID ของฉายา (Primary Key, เพิ่มอัตโนมัติ)
+  `title_name` VARCHAR(100) NOT NULL UNIQUE,    -- ชื่อฉายา เช่น 'นักเรียนคนเก่ง', 'ปรมาจารย์โค้ดดิ้ง' (ต้องไม่ซ้ำกัน)
+  `min_stars_required` INT NOT NULL UNIQUE,      -- จำนวนดาวรวมขั้นต่ำที่นักเรียนต้องมีเพื่อได้รับฉายานี้ (ต้องไม่ซ้ำกัน)
+    `css_class` VARCHAR(100) NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+INSERT INTO `titles` (`title_name`, `min_stars_required`, `css_class`) VALUES
+('นักคิดเริ่มต้น', 1, 'achievement-level-1'),
+('นักคิดตรรกะ', 15, 'achievement-level-2'),
+('ผู้เชี่ยวชาญเหตุผล', 30, 'achievement-level-3'),
+('นักสร้างคำสั่ง', 45, 'achievement-level-4'),
+('ผู้ควบคุมหุ่นยนต์', 55, 'achievement-level-5'),
+('ยอดนักวางแผน', 60, 'achievement-level-6'),
+('นักเขียนโค้ดจิ๋ว', 75, 'achievement-level-7'),
+('นักแก้ปัญหาด้วยภาษา', 85, 'achievement-level-8'),
+('ปรมาจารย์รหัสจำลอง', 90, 'achievement-level-9'),
+('นักออกแบบผังความคิด', 105, 'achievement-level-10'),
+('จอมวิเคราะห์ผังงาน', 115, 'achievement-level-11'),
+('จอมวางแผนผังงาน', 120, 'achievement-level-12'),
+('โค้ดดิ้งฮีโร่', 135, 'achievement-level-13'),
+('สุดยอดนักประดิษฐ์ดิจิทัล', 145, 'achievement-level-14'),
+('ครูคอมพิวเตอร์น้อย', 150, 'achievement-level-15');
