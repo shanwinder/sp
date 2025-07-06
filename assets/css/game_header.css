@@ -400,28 +400,29 @@
   }
 }
 
-/* ✅ ส่วนที่เพิ่มเข้ามา: Style สำหรับดาวรวมทั้งหมดบน Dashboard (#total-stars-dashboard) ✅ */
+/* ✅ Style สำหรับดาวรวมทั้งหมดบน Dashboard (#total-stars-dashboard) ✅ */
+/* ทำให้โดดเด่นขึ้นเล็กน้อย แต่ไม่ฉูดฉาดเท่าฉายา */
 #total-stars-dashboard {
-  /* เพิ่มขนาดตัวอักษรให้เด่นขึ้นอีกนิด */
-  font-size: 1.3rem; /* จากเดิม 1.2rem */
-  /* เปลี่ยนสีให้เป็นสีทองที่สื่อถึงดาว */
-  color: #ffd700; /* สีทองสดใส */
-  /* เพิ่มเงาข้อความเล็กน้อยให้ดูเรืองรองเบาๆ */
-  text-shadow: 0 0 3px #ffd700, /* เงาใกล้ๆ */ 0 0 6px rgba(255, 215, 0, 0.7); /* เงาฟุ้งๆ */
-  /* ทำให้เป็นตัวหนา */
-  font-weight: bold;
-  /* เพิ่ม Animation เบาๆ ให้ดูมีชีวิตชีวา */
-  animation: star-pulse 1.5s ease-in-out infinite alternate; /* แอนิเมชันกระพริบเบาๆ */
+    /* ขนาดที่เหมาะสม อ่านง่าย */
+    font-size: 1.3rem; /* เพิ่มขนาดเป็น 1.3rem เพื่อให้เด่นขึ้นจากข้อความปกติ */
+    /* สีที่ดูน่าเชื่อถือและกลมกลืนกับธีม แต่ยังคงความสดใส */
+    color: #039BE5; /* สีฟ้าสดใส */
+    /* ทำให้เป็นตัวหนา */
+    font-weight: bold;
+    /* เพิ่มเงาข้อความเล็กน้อยพอให้มีมิติ */
+    text-shadow: 0 0 3px rgba(3, 155, 229, 0.4); 
+    /* Animation เบาๆ ที่ไม่ฉูดฉาด */
+    animation: total-stars-pulse 1.8s ease-in-out infinite alternate;
 }
 
-/* @keyframes สำหรับ animation ของดาวรวม */
-@keyframes star-pulse {
-  from {
-    transform: scale(1); /* ขนาดปกติ */
-    opacity: 0.9; /* ความทึบแสงเล็กน้อย */
-  }
-  to {
-    transform: scale(1.05); /* ขยายใหญ่ขึ้นเล็กน้อย */
-    opacity: 1; /* ความทึบแสงเต็มที่ */
-  }
+/* @keyframes สำหรับ animation ของดาวรวม (#total-stars-dashboard) */
+@keyframes total-stars-pulse {
+    from {
+        transform: scale(1);
+        opacity: 0.95;
+    }
+    to {
+        transform: scale(1.03); /* ขยายใหญ่ขึ้นเล็กน้อยมากๆ */
+        opacity: 1;
+    }
 }

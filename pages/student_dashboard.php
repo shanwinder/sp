@@ -352,7 +352,7 @@ function getGameProgress($conn, $user_id, $game_id)
                         <div class="game-code"><?= htmlspecialchars($game['code']) ?></div>
                         <div class="progress-info">
                             ด่านที่ทำสำเร็จ: <?= $progress['passed'] ?>/<?= $progress['total'] ?><br>
-                            คะแนนรวม: <?= $progress['score'] ?>
+                            ดาวรวม: <?= $progress['score'] ?> 🌟
                             <div class="progress-bar">
                                 <div class="progress-bar-fill" style="width: <?= $percent ?>%;"></div>
                             </div>

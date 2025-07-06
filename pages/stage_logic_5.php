@@ -1,6 +1,6 @@
 <?php
-// File: pages/stage_logic_4.php
-// ด่าน 4: แบบรูปเรขาคณิต (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
+// File: pages/stage_logic_5.php
+// ด่าน 5: ลำดับสี (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
 // ไฟล์นี้จะถูกใช้ทับไฟล์เดิมที่อาจมีอยู่
 
 session_start();
@@ -9,11 +9,11 @@ require_once '../includes/db.php';
 
 // --- กำหนดค่าพื้นฐานของด่าน ---
 $user_id = $_SESSION['user_id'] ?? 0;
-$stage_id = 4; // ID ของด่านนี้คือ 4
-$game_title = "แบบรูปเรขาคณิต";
-$next_stage_link = "stage_logic_5.php";
+$stage_id = 5; // ✅ ID ของด่านนี้คือ 5 (ในตาราง stages)
+$game_title = "ลำดับสี"; // ✅ ชื่อด่าน
+$next_stage_link = "stage_logic_6.php"; // ✅ ลิงก์ไปยังด่านถัดไป (ด่าน 6 ของบทที่ 1)
 
-// หากคุณยังไม่มีไฟล์ stage_logic_5.php สามารถชี้ไปที่ student_dashboard.php ชั่วคราวก่อนได้
+// หากคุณยังไม่มีไฟล์ stage_logic_6.php สามารถชี้ไปที่ student_dashboard.php ชั่วคราวก่อนได้
 // $next_stage_link = "student_dashboard.php"; 
 ?>
 
@@ -35,8 +35,7 @@ $next_stage_link = "stage_logic_5.php";
         const STAGE_ID = <?= json_encode($stage_id) ?>;
     </script>
     <script src="../assets/js/shared/game_common.js"></script>
-    <script src="../assets/js/logic_game/stage4.js"></script>
-    <style>
+    <script src="../assets/js/logic_game/stage5.js"></script> <style>
         body {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(to right, #fef3c7, #bae6fd);
@@ -45,7 +44,6 @@ $next_stage_link = "stage_logic_5.php";
             flex-direction: column;
             padding-top: 80px;
         }
-
         main {
             flex: 1;
             display: flex;
@@ -76,7 +74,6 @@ $next_stage_link = "stage_logic_5.php";
                 aspect-ratio: 3 / 2;
             }
         }
-
         #instruction-box {
             background-color: #fff8dc;
             border: 3px dashed #facc15;
@@ -86,50 +83,38 @@ $next_stage_link = "stage_logic_5.php";
             margin: 20px auto;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
         #instruction-box h4 {
-            margin-top: 0;
-            font-weight: bold;
+            margin-top:0; 
+            font-weight: bold; 
             color: #b45309;
         }
-
         #instruction-box p {
-            font-size: 1.1rem;
+            font-size: 1.1rem; 
             margin-bottom: 8px;
         }
-
         #instruction-box p.target-goal {
-            font-size: 1rem;
+            font-size: 1rem; 
             color: #92400e;
         }
-
         #feedback-popup {
-            display: none;
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff8dc;
-            border: 3px solid #facc15;
-            padding: 30px;
-            border-radius: 16px;
-            font-size: 28px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            z-index: 999;
+            display:none; 
+            position:fixed; 
+            top:30%; 
+            left:50%; 
+            transform:translate(-50%, -50%);
+            background:#fff8dc; 
+            border:3px solid #facc15; 
+            padding:30px; 
+            border-radius:16px;
+            font-size:28px; 
+            text-align:center; 
+            box-shadow:0 10px 20px rgba(0,0,0,0.2); 
+            z-index:999;
             animation: popIn 0.6s ease;
         }
-
         @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0.6);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
+            0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -142,10 +127,10 @@ $next_stage_link = "stage_logic_5.php";
         <div id="instruction-box">
             <h4>📝 วิธีเล่น</h4>
             <p>
-                สังเกตแบบรูปของรูปทรง แล้วเลือกรูปทรงที่ถูกต้องมาเติมในช่องว่าง!
+                สังเกตแบบรูปของสี แล้วเลือกสีที่ถูกต้องมาเติมในช่องว่าง!
             </p>
             <p class="target-goal">
-                🎯 เป้าหมาย: เติมรูปทรงที่หายไปให้ถูกต้องทั้งหมด
+                🎯 เป้าหมาย: เติมสีที่หายไปให้ถูกต้องทั้งหมด
             </p>
         </div>
 
@@ -154,7 +139,7 @@ $next_stage_link = "stage_logic_5.php";
         </div>
         <div id="feedback-popup"></div>
     </main>
-
+    
     <?php include '../includes/student_footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

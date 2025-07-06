@@ -1,10 +1,11 @@
-// File: assets/js/logic_game/stage4.js
-// ด่าน 4: แบบรูปเรขาคณิต (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
+// File: assets/js/logic_game/stage5.js
+// ด่าน 5: ลำดับสี (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
 // รูปแบบ: เติมช่องว่างสัญลักษณ์ (เลือกจากตัวเลือก)
-// ✅ โค้ดใหม่ที่สร้างจาก stage1.js template และปรับปรุงสำหรับด่าน 4 โดยเฉพาะ
+// ใช้เป็นแม่แบบจาก stage4.js และปรับปรุงสำหรับเนื้อหาด่าน 5
+// ไฟล์นี้จะถูกใช้ทับไฟล์เดิมที่อาจมีอยู่
 
-(function () {
-    document.addEventListener('DOMContentLoaded', function () {
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
 
         const config = {
             type: Phaser.AUTO,
@@ -28,75 +29,89 @@
 
         let startTime;     // เวลาเริ่มต้นเล่นด่าน
         let attempts = 0;  // จำนวนครั้งที่พยายามตอบผิด
-        let currentProblemIndex = 0; // ด่านนี้จะมีหลายปัญหาย่อย (ใน array problems)
+        let currentProblemIndex = 0; // ด่านนี้จะมีหลายปัญหาย่อย
 
-        // ✅ ข้อมูลปัญหา: แบบรูป, คำตอบที่ถูกต้อง, ตัวเลือก (สามารถเพิ่มปัญหาใน Array ได้)
+        // ✅ ข้อมูลปัญหา: แบบรูปสี, คำตอบที่ถูกต้อง, ตัวเลือก
+        // ใช้ชื่อสีเป็น key สำหรับ asset ที่จะโหลด
         const problems = [
-            {
-                pattern: ["circle", "triangle", "circle", "?"],
-                answer: "triangle",
-                choices: ["triangle", "square"]
+            { 
+                pattern: ["red_circle", "blue_circle", "red_circle", "?"], 
+                answer: "blue_circle", 
+                choices: ["blue_circle", "green_circle"] 
             },
-            {
-                pattern: ["square", "square", "circle", "circle", "?"],
-                answer: "square",
-                choices: ["square", "triangle", "circle"]
+            { 
+                pattern: ["yellow_square", "yellow_square", "red_square", "?"], 
+                answer: "red_square", 
+                choices: ["red_square", "blue_square"] 
             },
-            {
-                pattern: ["triangle", "circle", "square", "triangle", "?"],
-                answer: "circle",
-                choices: ["circle", "square"]
+            { 
+                pattern: ["green_triangle", "blue_triangle", "green_triangle", "?"], 
+                answer: "blue_triangle", 
+                choices: ["blue_triangle", "yellow_triangle"] 
             }
         ];
-        let solvedProblems = 0; // นับจำนวนปัญหาที่แก้ได้ (เมื่อตอบถูกครบทุก blank ใน pattern)
+        let solvedProblems = 0; // นับจำนวนปัญหาที่แก้ได้
 
         // --- ฟังก์ชัน Preload: โหลดทรัพยากรล่วงหน้า ---
         function preload() {
-            console.log("Stage 4: Preload started.");
-            // ✅ โหลดภาพรูปทรงเรขาคณิต (ตรวจสอบ Path และไฟล์ให้ถูกต้อง)
-            this.load.image("circle", "../assets/img/circle.webp");
-            this.load.image("triangle", "../assets/img/triangle.webp");
-            this.load.image("square", "../assets/img/square.webp");
+            console.log("Stage 5: Preload started.");
+            // ✅ โหลดภาพวงกลมสีต่างๆ (คุณต้องเตรียมไฟล์ภาพเหล่านี้ไว้ในโฟลเดอร์ assets/img/)
+            this.load.image("red_circle", "../assets/img/red_circle.webp");
+            this.load.image("blue_circle", "../assets/img/blue_circle.webp");
+            this.load.image("green_circle", "../assets/img/green_circle.webp");
+            this.load.image("yellow_circle", "../assets/img/yellow_circle.webp");
+
+            // ✅ โหลดภาพสี่เหลี่ยมสีต่างๆ
+            this.load.image("red_square", "../assets/img/red_square.webp");
+            this.load.image("blue_square", "../assets/img/blue_square.webp");
+            this.load.image("green_square", "../assets/img/green_square.webp");
+            this.load.image("yellow_square", "../assets/img/yellow_square.webp");
+
+            // ✅ โหลดภาพสามเหลี่ยมสีต่างๆ
+            this.load.image("red_triangle", "../assets/img/red_triangle.webp");
+            this.load.image("blue_triangle", "../assets/img/blue_triangle.webp");
+            this.load.image("green_triangle", "../assets/img/green_triangle.webp");
+            this.load.image("yellow_triangle", "../assets/img/yellow_triangle.webp");
+
 
             this.load.audio("correct", "../assets/sound/correct.mp3");
             this.load.audio("wrong", "../assets/sound/wrong.mp3");
-            console.log("Stage 4: Assets loaded.");
+            console.log("Stage 5: Assets loaded.");
         }
 
         // --- ฟังก์ชัน Create: สร้างองค์ประกอบของเกม ---
         function create() {
-            console.log("Stage 4: Create started.");
+            console.log("Stage 5: Create started.");
             const scene = this;
 
             startTime = Date.now();
-            attempts = 0;
-            solvedProblems = 0; // Reset สำหรับด่านใหม่
+            attempts = 0; 
+            solvedProblems = 0;
 
             const graphics = scene.add.graphics();
             graphics.fillGradientStyle(0x87CEEB, 0x87CEEB, 0x98FB98, 0x98FB98, 1);
             graphics.fillRect(0, 0, config.scale.width, config.scale.height);
             graphics.setDepth(-2);
-
+            
             const puzzleZoneBg = scene.add.graphics();
             puzzleZoneBg.fillStyle(0xfffbe6, 0.9).fillRoundedRect(25, 25, 850, 550, 20).setDepth(-1);
 
-            // ✅ แสดงปัญหาแรก
             renderProblem(scene, problems[currentProblemIndex]);
-            console.log("Stage 4: Initial problem rendered.");
+            console.log("Stage 5: Initial problem rendered.");
         }
 
-        // ✅ ฟังก์ชันสำหรับแสดงปัญหาแต่ละข้อย่อย
+        // ฟังก์ชันสำหรับแสดงปัญหาแต่ละข้อย่อย
         function renderProblem(scene, problem) {
             console.log(`Rendering Problem ${currentProblemIndex + 1}:`, problem);
-            // ลบ Element เก่าออกก่อน ถ้ามี (สำคัญมากในการสร้างใหม่)
+            // ลบ Element เก่าออกก่อน ถ้ามี
             if (scene.problemElements) {
                 scene.problemElements.forEach(el => el.destroy());
             }
-            scene.problemElements = []; // รีเซ็ต Array
+            scene.problemElements = [];
 
             // แสดงหัวข้อปัญหา
-            const titleText = scene.add.text(config.scale.width / 2, 80, `ปัญหาที่ ${currentProblemIndex + 1} จาก ${problems.length}`, {
-                fontSize: '32px', color: '#1e3a8a', fontFamily: 'Kanit, Arial'
+            const titleText = scene.add.text(config.scale.width / 2, 80, `ปัญหาที่ ${currentProblemIndex + 1} จาก ${problems.length}`, { 
+                fontSize: '32px', color: '#1e3a8a', fontFamily: 'Kanit, Arial' 
             }).setOrigin(0.5);
             scene.problemElements.push(titleText);
 
@@ -112,7 +127,7 @@
                 if (shapeKey === "?") {
                     // สร้างช่องว่างสำหรับเติม
                     const blank = scene.add.graphics().lineStyle(3, 0x6b7280).strokeRect(x - shapeSize / 2, patternY - shapeSize / 2, shapeSize, shapeSize);
-                    const dropZone = scene.add.zone(x, patternY, shapeSize, shapeSize).setRectangleDropZone(shapeSize, shapeSize); // ใช้เป็นพื้นที่สำหรับให้ภาพถูก "เติม" เข้าไป
+                    const dropZone = scene.add.zone(x, patternY, shapeSize, shapeSize).setRectangleDropZone(shapeSize, shapeSize); 
                     dropZone.setData({ type: "blank", index: index });
                     scene.problemElements.push(blank, dropZone);
                 } else {
@@ -132,17 +147,16 @@
             // สร้างตัวเลือกสำหรับตอบ (Interactive Choices)
             problem.choices.forEach((choiceKey, index) => {
                 const x = choicesStartX + index * (choiceSize + choicePadding);
-                // ✅ ใช้ setDisplaySize(100, 100) เพียงอย่างเดียว
                 const choiceImage = scene.add.image(x, choicesY, choiceKey)
-                    .setDisplaySize(choiceSize, choiceSize) // กำหนดขนาดแสดงผล
-                    .setInteractive({ useHandCursor: true }); // ทำให้คลิกได้
-
+                                        .setDisplaySize(choiceSize, choiceSize)
+                                        .setInteractive({ useHandCursor: true });
+                                        
                 // บันทึกตำแหน่งเริ่มต้นของภาพตัวเลือกทันทีที่สร้าง (ใช้สำหรับแอนิเมชันสั่น)
                 choiceImage.setData('originalX', x);
                 choiceImage.setData('originalY', choicesY);
 
                 console.log(`Created choice "${choiceKey}": displaySize(${choiceImage.displayWidth}, ${choiceImage.displayHeight}), scale(${choiceImage.scaleX}, ${choiceImage.scaleY})`);
-
+                                        
                 choiceImage.setData({ type: "choice", value: choiceKey }); // เก็บข้อมูลตัวเลือก
                 scene.problemElements.push(choiceImage);
 
@@ -150,11 +164,9 @@
                 choiceImage.on('pointerdown', () => {
                     // รีเซ็ตภาพตัวเลือกอื่นๆ ที่อาจมีการเคลื่อนไหว (จากการสั่นครั้งก่อน) ให้กลับสู่ตำแหน่งเดิมและ scale ปกติ
                     scene.children.list.forEach(child => {
-                        // ตรวจสอบว่าเป็นภาพตัวเลือก และไม่ใช่ภาพที่เพิ่งถูกคลิก
-                        if (child.getData && child.getData('type') === 'choice' && child !== choiceImage) {
+                        if (child.getData && child.getData('type') === 'choice' && child !== choiceImage) { 
                             const childOriginalX = child.getData('originalX');
                             const childOriginalY = child.getData('originalY');
-                            // ตรวจสอบว่าตำแหน่งปัจจุบันไม่ตรงกับตำแหน่งเริ่มต้น หรือ scale ไม่ใช่ 1
                             if (child.x !== childOriginalX || child.y !== childOriginalY || child.scaleX !== 1) {
                                 scene.tweens.add({
                                     targets: child,
@@ -167,14 +179,13 @@
                             }
                         }
                     });
-                    // เรียก checkAnswer โดยส่ง choiceImage (ภาพที่ถูกคลิก) เข้าไป
                     checkAnswer(scene, choiceImage, problem.answer);
                 });
             });
             console.log("Problem rendered. All choices created.");
         }
 
-        // ✅ ฟังก์ชันตรวจสอบคำตอบ
+        // ฟังก์ชันตรวจสอบคำตอบ
         function checkAnswer(scene, chosenImage, correctAnswer) {
             console.log("CheckAnswer called for:", chosenImage.getData('value'), "Correct:", correctAnswer);
             const problem = problems[currentProblemIndex];
@@ -183,16 +194,15 @@
                 scene.sound.play('correct');
                 const blankZone = scene.children.list.find(el => el.type === 'Zone' && el.getData('type') === 'blank');
                 if (blankZone) {
-                    // สร้างภาพรูปทรงที่เลือกแล้วย้ายไปแทนที่ช่องว่าง
                     const correctShape = scene.add.image(blankZone.x, blankZone.y, chosenImage.getData('value')).setDisplaySize(100, 100);
                     scene.problemElements.push(correctShape);
                     // ปิดการโต้ตอบของตัวเลือกทั้งหมดหลังจากตอบถูกแล้ว
                     problem.choices.forEach(choiceKey => {
                         const img = scene.children.list.find(el => el.type === 'Image' && el.getData('type') === 'choice' && el.getData('value') === choiceKey);
-                        if (img) img.disableInteractive().setAlpha(0.5);
+                        if(img) img.disableInteractive().setAlpha(0.5);
                     });
                 }
-
+                
                 solvedProblems++;
                 scene.time.delayedCall(1000, () => {
                     currentProblemIndex++;
@@ -207,10 +217,10 @@
                 scene.sound.play('wrong');
                 scene.cameras.main.shake(150, 0.005); // กล้องสั่น
                 attempts++;
-
+                
                 // แอนิเมชัน "สั่น" ภาพตัวเลือกที่ตอบผิด
-                const originalX = chosenImage.getData('originalX');
-                const originalY = chosenImage.getData('originalY');
+                const originalX = chosenImage.getData('originalX'); 
+                const originalY = chosenImage.getData('originalY'); 
 
                 scene.tweens.add({
                     targets: chosenImage,
@@ -221,7 +231,7 @@
                     ease: 'Sine.easeInOut', // ทำให้การขยับดูนุ่มนวลขึ้น
                     onComplete: () => {
                         // สำคัญ: บังคับกลับตำแหน่งเดิมเป๊ะๆ หลังจาก Tween จบ เพื่อความชัวร์
-                        chosenImage.setPosition(originalX, originalY);
+                        chosenImage.setPosition(originalX, originalY); 
                         chosenImage.setScale(1); // บังคับ scale กลับ 1 ด้วย
                         console.log("Tween complete (Shake). Final position:", chosenImage.x, chosenImage.y, "Final scale:", chosenImage.scaleX);
                     }
@@ -231,7 +241,7 @@
 
         // --- ฟังก์ชันเมื่อด่านสำเร็จ ---
         function onStageComplete(scene) {
-            console.log("Stage 4: onStageComplete called.");
+            console.log("Stage 5: onStageComplete called.");
             const endTime = Date.now();
             const durationSeconds = Math.floor((endTime - startTime) / 1000);
             let starsEarned = 0;
@@ -246,10 +256,10 @@
             } else if (solvedProblems === problems.length) {
                 starsEarned = 1;
             } else {
-                starsEarned = 0;
+                starsEarned = 0; 
             }
 
-            console.log("Stage 4 Complete! Stars to send:", starsEarned, "Duration:", durationSeconds, "Attempts (wrong answers):", finalAttempts, "Solved Problems:", solvedProblems);
+            console.log("Stage 5 Complete! Stars to send:", starsEarned, "Duration:", durationSeconds, "Attempts (wrong answers):", finalAttempts, "Solved Problems:", solvedProblems);
 
             scene.time.delayedCall(800, () => {
                 if (scene.problemElements) {
@@ -264,7 +274,7 @@
                 const rect = scene.add.rectangle(0, 0, config.scale.width, config.scale.height, 0x000000, 0.7).setInteractive();
                 container.add(rect);
 
-                const winText = scene.add.text(0, -50, "🎉 ยอดเยี่ยม! ผ่านด่านที่ 4 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5);
+                const winText = scene.add.text(0, -50, "🎉 ยอดเยี่ยม! ผ่านด่านที่ 5 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5);
                 container.add(winText);
 
                 const scoreText = scene.add.text(0, 20, `ได้รับ ${starsEarned} ดาว!`, { fontSize: '32px', color: '#ffffff', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
