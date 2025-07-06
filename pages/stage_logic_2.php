@@ -11,7 +11,7 @@ require_once '../includes/db.php';
 $user_id = $_SESSION['user_id'] ?? 0; // USER_ID ต้องมีค่าจากการล็อกอินจริง
 $stage_id = 2; // ✅ ID ของด่านนี้คือ 2 (ในตาราง stages)
 $game_title = "กิจวัตรประจำวัน"; // ✅ ชื่อด่าน
-$next_stage_link = "stage_logic_1_03.php"; // ✅ ลิงก์ไปยังด่านถัดไป (ด่าน 3 ของบทที่ 1)
+$next_stage_link = "stage_logic_3.php"; // ✅ ลิงก์ไปยังด่านถัดไป (ด่าน 3 ของบทที่ 1)
 
 // หากคุณยังไม่มีไฟล์ stage_logic_1_03.php สามารถชี้ไปที่ student_dashboard.php ชั่วคราวก่อนได้
 // $next_stage_link = "student_dashboard.php"; 
