@@ -1,13 +1,20 @@
 <?php
-// File: stage_logic_2.php
+// File: pages/stage_logic_2.php
+// ด่าน 2: กิจวัตรประจำวัน (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
+// ใช้ชื่อไฟล์นี้ตามคำขอของครู
+
 session_start();
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
 
-$user_id = $_SESSION['user_id'];
-$stage_id = 2;
-$game_title = "OX ตรรกะ";
-$next_stage_link = "stage_logic_3.php";
+// --- กำหนดค่าพื้นฐานของด่าน ---
+$user_id = $_SESSION['user_id'] ?? 0; // USER_ID ต้องมีค่าจากการล็อกอินจริง
+$stage_id = 2; // ✅ ID ของด่านนี้คือ 2 (ในตาราง stages)
+$game_title = "กิจวัตรประจำวัน"; // ✅ ชื่อด่าน
+$next_stage_link = "stage_logic_1_03.php"; // ✅ ลิงก์ไปยังด่านถัดไป (ด่าน 3 ของบทที่ 1)
+
+// หากคุณยังไม่มีไฟล์ stage_logic_1_03.php สามารถชี้ไปที่ student_dashboard.php ชั่วคราวก่อนได้
+// $next_stage_link = "student_dashboard.php"; 
 ?>
 
 <!DOCTYPE html>
@@ -15,134 +22,125 @@ $next_stage_link = "stage_logic_3.php";
 
 <head>
     <meta charset="UTF-8" />
-    <title>เกม OX ตรรกะ - ด่านที่ 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title><?= htmlspecialchars($game_title) ?> - ด่านที่ <?= htmlspecialchars($stage_id) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="../assets/css/game_common.css">
     <link rel="stylesheet" href="../assets/css/game_header.css">
-
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script>
-        const USER_ID = <?= $user_id ?>;
-        const STAGE_ID = <?= $stage_id ?>;
+        // ✅ กำหนดค่า USER_ID และ STAGE_ID ให้กับ JavaScript
+        const USER_ID = <?= json_encode($user_id) ?>;
+        const STAGE_ID = <?= json_encode($stage_id) ?>;
     </script>
     <script src="../assets/js/shared/game_common.js"></script>
-    <script src="../assets/js/logic_game/stage2.js"></script>
-
-    <style>
+    <script src="../assets/js/logic_game/stage2.js"></script> <style>
         body {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(to right, #fef3c7, #bae6fd);
-            margin: 0;
+            min-height: 100vh;
+            display: flex; /* เพิ่มเพื่อให้ footer อยู่ด้านล่างสุด */
+            flex-direction: column; /* เพิ่มเพื่อให้ footer อยู่ด้านล่างสุด */
             padding-top: 80px;
+        }
+        main {
+            flex: 1; /* ทำให้ main ขยายเต็มพื้นที่ */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
         }
 
         #game-container {
             width: 100%;
-            max-width: 500px;
-            /* ปรับ max-width ให้เท่ากับความกว้างของเกม */
+            max-width: 900px;
+            aspect-ratio: 3 / 2;
+            background-color: #fff3cd;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
             margin: 20px auto;
-            display: flex;
-            /* เพิ่ม display flex เพื่อให้ container พอดีกับเกม */
-            justify-content: center;
         }
 
-        #feedback-popup {
-            display: none;
-            position: fixed;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff8dc;
-            border: 3px solid #facc15;
-            padding: 30px;
+        .btn-nav {
+            margin-left: 10px;
+        }
+
+        @media (max-width: 576px) {
+            #game-container {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 3 / 2;
+            }
+        }
+        #instruction-box {
+            background-color: #fff8dc;
+            border: 3px dashed #facc15;
             border-radius: 16px;
-            font-size: 28px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            z-index: 999;
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        #instruction-box h4 {
+            margin-top:0; 
+            font-weight: bold; 
+            color: #b45309;
+        }
+        #instruction-box p {
+            font-size: 1.1rem; 
+            margin-bottom: 8px;
+        }
+        #instruction-box p.target-goal {
+            font-size: 1rem; 
+            color: #92400e;
+        }
+        #feedback-popup {
+            display:none; 
+            position:fixed; 
+            top:30%; 
+            left:50%; 
+            transform:translate(-50%, -50%);
+            background:#fff8dc; 
+            border:3px solid #facc15; 
+            padding:30px; 
+            border-radius:16px;
+            font-size:28px; 
+            text-align:center; 
+            box-shadow:0 10px 20px rgba(0,0,0,0.2); 
+            z-index:999;
             animation: popIn 0.6s ease;
         }
-
         @keyframes popIn {
-            0% {
-                transform: translate(-50%, -50%) scale(0.6);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-
-        footer {
-            width: 100%;
-            margin-top: auto;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        .footer-box {
-            background: rgba(255, 255, 255, 0.75);
-            margin: auto;
-            padding: 15px 10px;
-            border-radius: 15px;
-            max-width: 800px;
-            font-size: 0.9rem;
+            0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
     </style>
 </head>
 
 <body>
 
-    <?php
-    include '../includes/game_header.php';
-    ?>
-    <div class="container mt-4" style="max-width: 700px;">
-        <div class="alert alert-warning" role="alert" style="font-size: 1.1rem;">
-            <strong>📝 วิธีการเล่น:</strong><br>
-            เล่นเกม OX กับคอมพิวเตอร์ โดยคุณเป็นฝั่ง <strong>⭕</strong> และคอมเป็น <strong>❌</strong><br>
-            เป้าหมายคือ ชนะให้ได้ <strong>3 ครั้งติดต่อกัน</strong> จึงจะผ่านด่านนี้ได้<br>
-            ใช้ทักษะการวางแผนและการคาดการณ์ล่วงหน้าอย่างมีเหตุผล!
+    <?php include '../includes/game_header.php'; ?>
+
+    <main>
+        <div id="instruction-box">
+            <h4>📝 วิธีเล่น</h4>
+            <p>
+                ให้สังเกตลำดับภาพเหตุการณ์ในกิจวัตรประจำวัน แล้วลากภาพให้เรียงลำดับให้ถูกต้อง!
+            </p>
+            <p class="target-goal">
+                🎯 เป้าหมาย: วางภาพเหตุการณ์ให้ตรงตำแหน่งที่หายไปทั้งหมด
+            </p>
         </div>
-    </div>
 
-    <div id="game-container"></div>
-
-    <div id="feedback-popup"></div>
-
-    <?php
-    // ✅ ส่วนนี้จะถูกจัดการโดย submit_stage_score.php แล้ว
-    // ดังนั้นใน stage_logic_2.php ไม่จำเป็นต้องมี PHP POST block นี้อีกต่อไป
-    // ผมจะคอมเมนต์ส่วนนี้ไว้เพื่อแสดงให้เห็นว่าสามารถลบออกได้
-    /*
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $score = (int) $_POST['score'];
-        $completed_at = ($score === 100) ? date('Y-m-d H:i:s') : null;
-
-        $stmt = $conn->prepare("INSERT INTO progress (user_id, stage_id, score, attempts, completed_at)
-        VALUES (?, ?, ?, 1, ?)
-        ON DUPLICATE KEY UPDATE
-        score = VALUES(score),
-        attempts = attempts + 1,
-        completed_at = VALUES(completed_at)");
-        $stmt->bind_param("iiis", $user_id, $stage_id, $score, $completed_at);
-        $stmt->execute();
-        $stmt->close();
-
-        $action = ($score === 100) ? 'pass' : 'fail';
-        $detail = json_encode(['score' => $score]);
-        $stmt = $conn->prepare("INSERT INTO game_logs (user_id, stage_id, action, detail) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("iiss", $user_id, $stage_id, $action, $detail);
-        $stmt->execute();
-        $stmt->close();
-
-        exit;
-    }
-    */
-    ?>
-
+        <div id="game-wrapper">
+            <div id="game-container"></div>
+        </div>
+        <div id="feedback-popup"></div>
+    </main>
+    
     <?php include '../includes/student_footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

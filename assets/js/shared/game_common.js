@@ -78,7 +78,6 @@ window.sendResult = function (stageId, starsEarned, durationSeconds = 0, attempt
  * เรียกใช้เมื่อมีการโหลดหน้า Dashboard หรือเมื่อมีการส่งคะแนนด่านสำเร็จ
  */
 window.updateTotalStarsAndAchievement = function () {
-    // ✅ Path ไปยังไฟล์ API ใน Backend ต้องถูกต้อง
     fetch('../api/get_current_achievement.php')
         .then(response => response.json())
         .then(data => {
@@ -94,29 +93,34 @@ window.updateTotalStarsAndAchievement = function () {
                 window.animateScoreChange(currentScore, data.total_stars);
             }
 
-            // อัปเดตฉายาบนหน้า Dashboard (element ที่มี id='current-achievement')
+            // ✅ ส่วนเพิ่ม: อัปเดตคะแนนดาวรวมบนหน้า Dashboard
+            const totalStarsDashboardElement = document.getElementById('total-stars-dashboard');
+            if (totalStarsDashboardElement) {
+                totalStarsDashboardElement.textContent = data.total_stars;
+            }
+            // ✅ สิ้นสุดส่วนเพิ่ม
+
+            // อัปเดตฉายาบนหน้า Dashboard
             const achievementDashboardElement = document.getElementById('current-achievement');
             if (achievementDashboardElement) {
                 achievementDashboardElement.textContent = data.current_title;
-                // ✅ แก้ไข: ตรวจสอบว่ามี data.current_title_class ก่อนที่จะกำหนด
                 if (data.current_title_class) {
-                    achievementDashboardElement.className = ''; // ลบ class เดิมออกก่อน
-                    achievementDashboardElement.classList.add(data.current_title_class); // เพิ่ม class ใหม่
+                    achievementDashboardElement.className = '';
+                    achievementDashboardElement.classList.add(data.current_title_class);
                 } else {
-                    achievementDashboardElement.className = ''; // ถ้าไม่มี class ก็ให้ว่างไว้
+                    achievementDashboardElement.className = '';
                 }
             }
 
-            // อัปเดตฉายาบน Header ขณะเล่นเกม (element ที่มี id='current-achievement-game-header')
+            // อัปเดตฉายาบน Header ขณะเล่นเกม
             const achievementGameHeaderElement = document.getElementById('current-achievement-game-header');
             if (achievementGameHeaderElement) {
                 achievementGameHeaderElement.textContent = data.current_title;
-                // ✅ แก้ไข: ตรวจสอบว่ามี data.current_title_class ก่อนที่จะกำหนด
                 if (data.current_title_class) {
-                    achievementGameHeaderElement.className = ''; // ลบ class เดิมออกก่อน
-                    achievementGameHeaderElement.classList.add(data.current_title_class); // เพิ่ม class ใหม่
+                    achievementGameHeaderElement.className = '';
+                    achievementGameHeaderElement.classList.add(data.current_title_class);
                 } else {
-                    achievementGameHeaderElement.className = ''; // ถ้าไม่มี class ก็ให้ว่างไว้
+                    achievementGameHeaderElement.className = '';
                 }
             }
 
