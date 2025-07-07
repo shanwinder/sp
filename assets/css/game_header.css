@@ -29,14 +29,11 @@
   font-weight: bold; /* ทำให้ตัวหนาขึ้น */
   transition: all 0.5s ease-in-out; /* เพิ่ม transition เพื่อให้การเปลี่ยน class ดูนุ่มนวล */
   /* กำหนดค่าเริ่มต้นเพื่อป้องกัน style ซ้อนทับ หรือ เพื่อให้มีค่าที่แน่นอน */
-  text-shadow: none;
-  animation: none;
-  background: none;
-  -webkit-background-clip: unset;
-  background-clip: unset;
-  -webkit-text-fill-color: unset;
-  color: inherit; /* ให้สีเป็นไปตามที่ class กำหนด */
-  font-size: 0.95rem; /* ขนาดเริ่มต้นเท่ากับ .info-text */
+
+
+
+
+
 }
 
 /* --- ระดับ 1: นักคิดเริ่มต้น (Min Stars: 1) --- */
@@ -48,7 +45,7 @@
 /* --- ระดับ 2: นักคิดตรรกะ (Min Stars: 15) --- */
 .achievement-level-2 {
   color: #2196f3; /* สีฟ้าสดใส */
-  text-shadow: 0 0 3px #2196f3, 0 0 6px rgba(33, 150, 243, 0.6);
+  text-shadow: 0 0 2px #2196f3, 0 0 4px rgba(33, 150, 243, 0.6);
 }
 
 /* --- ระดับ 3: ผู้เชี่ยวชาญเหตุผล (Min Stars: 30) --- */
@@ -406,11 +403,11 @@
     /* ขนาดที่เหมาะสม อ่านง่าย */
     font-size: 1.3rem; /* เพิ่มขนาดเป็น 1.3rem เพื่อให้เด่นขึ้นจากข้อความปกติ */
     /* สีที่ดูน่าเชื่อถือและกลมกลืนกับธีม แต่ยังคงความสดใส */
-    color: #039BE5; /* สีฟ้าสดใส */
+    color: #e5b003; /* สีฟ้าสดใส */
     /* ทำให้เป็นตัวหนา */
     font-weight: bold;
     /* เพิ่มเงาข้อความเล็กน้อยพอให้มีมิติ */
-    text-shadow: 0 0 3px rgba(3, 155, 229, 0.4); 
+    text-shadow: 0 0 3px rgba(255, 230, 0, 0.4); 
     /* Animation เบาๆ ที่ไม่ฉูดฉาด */
     animation: total-stars-pulse 1.8s ease-in-out infinite alternate;
 }
