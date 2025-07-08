@@ -6,6 +6,7 @@
 session_start();
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
+requireStudent(); // จำกัดเฉพาะนักเรียนเท่านั้นที่เข้าถึงได้
 
 // --- กำหนดค่าพื้นฐานของด่าน ---
 $user_id = $_SESSION['user_id'] ?? 0; // USER_ID ต้องมีค่าจากการล็อกอินจริง

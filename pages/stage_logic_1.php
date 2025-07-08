@@ -3,6 +3,7 @@
 session_start();
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
+requireStudent(); // จำกัดเฉพาะนักเรียนเท่านั้นที่เข้าถึงได้
 
 $user_id = $_SESSION['user_id'];
 $stage_id = 1;

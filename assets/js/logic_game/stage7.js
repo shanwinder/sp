@@ -50,7 +50,7 @@
                 rule: "จงจำแนกสัตว์ตามลักษณะการเคลื่อนที่หลัก",
                 animalsToSort: ["frog", "snake", "duck"],
                 portals: [
-                    { name: "เดิน/เลื้อย", image: "land_portal", category: "walk_crawl" },
+                    { name: "กระโดด/เลื้อย", image: "land_portal", category: "walk_crawl" },
                     { name: "ว่ายน้ำ", image: "water_portal", category: "swim" },
                     { name: "บิน", image: "air_portal", category: "fly" }
                 ],
