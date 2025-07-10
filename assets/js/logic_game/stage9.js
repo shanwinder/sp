@@ -1,11 +1,10 @@
 // File: assets/js/logic_game/stage9.js
 // ด่าน 9: วัตถุเปลี่ยนรูป (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
-// ✅ รูปแบบ: Drag & Drop คาดการณ์ผลลัพธ์การเปลี่ยนแปลงวัตถุ
-// ✅ ปรับปรุง: ใช้ภาษาอังกฤษง่ายๆ ในเกม, และแก้ไขปัญหาอื่นๆ
+// ✅ แก้ไข: ภาพไม่แสดงขนาดจริงตั้งแต่ต้น, บังคับ Scale ตั้งแต่สร้าง
 
 (function() {
     document.addEventListener('DOMContentLoaded', function() {
-        // ✅ สำคัญ: รอให้ฟอนต์ Kanit โหลดเสร็จก่อนสร้างเกม Phaser
+        // สำคัญ: รอให้ฟอนต์ Kanit โหลดเสร็จก่อนสร้างเกม Phaser
         document.fonts.ready.then(function() {
             console.log("Web Fonts ready for Stage 9. Initializing Phaser game.");
 
@@ -33,38 +32,36 @@
             let attempts = 0;  // จำนวนครั้งที่พยายามตอบผิด
             let solvedProblems = 0; // นับจำนวนปัญหาย่อยที่แก้ได้
 
-            // ✅ ข้อมูลปัญหา: วัตถุเริ่มต้น, กฎการเปลี่ยนแปลง, คำตอบที่ถูกต้อง (ภาพผลลัพธ์), ตัวเลือก
             const problems = [
                 { // ปัญหาที่ 1: เปลี่ยนสีและหมุน
-                    rule: "Blue Square: 1.Change to Red 2.Rotate 90 degrees", // ✅ กฎเป็นภาษาอังกฤษ
+                    rule: "สี่เหลี่ยมน้ำเงิน: แดง ➡️ หมุน 90°",
                     initialObject: "blue_square", 
-                    transformations: ["Change Color: Red", "Rotate: 90°"], // ✅ คำอธิบายกฎเป็นภาษาอังกฤษ
+                    transformations: ["เปลี่ยนสี: แดง", "หมุน: 90°"],
                     correctAnswer: "red_square_rotated_90", 
                     options: Phaser.Utils.Array.Shuffle(["red_square_rotated_90", "red_square_normal", "blue_square_rotated_90", "green_square_normal"])
                 },
                 { // ปัญหาที่ 2: ขยายและเปลี่ยนรูปทรง
-                    rule: "Green Circle: 1.Scale 2X 2.Change to Triangle", // ✅ กฎเป็นภาษาอังกฤษ
+                    rule: "วงกลมเขียว: ขยาย 📈 2X ➡️ สามเหลี่ยม",
                     initialObject: "green_circle",
-                    transformations: ["Scale: 2X", "Shape: Triangle"], // ✅ คำอธิบายกฎเป็นภาษาอังกฤษ
+                    transformations: ["ขยาย: 2X", "เปลี่ยนรูปทรง: สามเหลี่ยม"],
                     correctAnswer: "green_triangle_large",
                     options: Phaser.Utils.Array.Shuffle(["green_triangle_large", "green_circle_large", "blue_triangle_large", "red_triangle_large"])
                 },
                 { // ปัญหาที่ 3: สะท้อนและเปลี่ยนสี
-                    rule: "Red Triangle: 1.Flip Horizontal 2.Change to Blue", // ✅ กฎเป็นภาษาอังกฤษ
+                    rule: "สามเหลี่ยมแดง: สะท้อน ↔️ ➡️ ฟ้า",
                     initialObject: "red_triangle",
-                    transformations: ["Flip: Horizontal", "Change Color: Blue"], // ✅ คำอธิบายกฎเป็นภาษาอังกฤษ
+                    transformations: ["สะท้อน: แนวนอน", "เปลี่ยนสี: ฟ้า"],
                     correctAnswer: "blue_triangle_flipped",
                     options: Phaser.Utils.Array.Shuffle(["blue_triangle_flipped", "red_triangle_normal", "blue_triangle_normal", "green_triangle_flipped"])
                 }
             ];
             
-            let targetDropZone; // พื้นที่เป้าหมายสำหรับวางผลลัพธ์
-            let draggableOptions = []; // Array เก็บตัวเลือกที่ลากได้
+            let targetDropZone; 
+            let draggableOptions = []; 
 
             // --- ฟังก์ชัน Preload: โหลดทรัพยากรล่วงหน้า ---
             function preload() {
                 console.log("Stage 9: Preload started.");
-                // โหลดภาพวัตถุเริ่มต้นและภาพผลลัพธ์การแปลงต่างๆ (ต้องเตรียม Asset เหล่านี้)
                 this.load.image("blue_square", "../assets/img/objects/blue_square.webp");
                 this.load.image("red_square_rotated_90", "../assets/img/objects/red_square_rotated_90.webp");
                 this.load.image("red_square_normal", "../assets/img/objects/red_square_normal.webp"); 
@@ -82,6 +79,12 @@
                 this.load.image("red_triangle_normal", "../assets/img/objects/red_triangle_normal.webp"); 
                 this.load.image("blue_triangle_normal", "../assets/img/objects/blue_triangle_normal.webp"); 
                 this.load.image("green_triangle_flipped", "../assets/img/objects/green_triangle_flipped.webp"); 
+
+                // โหลด Icon สำหรับกฎการเปลี่ยนแปลง
+                this.load.image("arrow_icon", "../assets/img/icons/arrow_right.webp");
+                this.load.image("arrow_icon_rotate", "../assets/img/icons/arrow_rotate.webp");
+                this.load.image("arrow_icon_scale", "../assets/img/icons/arrow_scale.webp");
+                this.load.image("arrow_icon_flip_h", "../assets/img/icons/arrow_flip_h.webp");
 
                 this.load.audio("correct", "../assets/sound/correct.mp3");
                 this.load.audio("wrong", "../assets/sound/wrong.mp3");
@@ -115,7 +118,7 @@
                 choicesZoneBg.strokeRoundedRect(25, 350, 850, 225, 20);
                 choicesZoneBg.fillRoundedRect(25, 350, 850, 225, 20).setDepth(-1);
 
-                renderProblem(scene, problems[currentProblemIndex]);
+                renderProblem(scene, problems[currentProblemIndex]); 
                 console.log("Stage 9: Initial problem rendered.");
 
                 scene.input.on('dragstart', (pointer, gameObject) => {
@@ -132,9 +135,9 @@
                 scene.input.on('drop', (pointer, gameObject, dropZone) => {
                     gameObject.clearTint();
 
-                    const isTargetDropZone = dropZone.getData('type') === 'target_area' && !dropZone.getData('isFilled');
+                    const isCorrectDropZone = dropZone.getData('type') === 'target_area' && !dropZone.getData('isFilled');
                     
-                    if (isTargetDropZone && gameObject.getData('itemType') === problems[currentProblemIndex].correctAnswer) { 
+                    if (isCorrectDropZone && gameObject.getData('itemType') === problems[currentProblemIndex].correctAnswer) { 
                         scene.sound.play('correct');
                         gameObject.disableInteractive(); 
                         
@@ -186,64 +189,77 @@
             }
 
 
-            // ✅ ฟังก์ชันสำหรับแสดงปัญหาแต่ละข้อย่อย
-            function renderProblem(scene_param, problem) { // ✅ เปลี่ยนชื่อเป็น scene_param
+            // ฟังก์ชันสำหรับแสดงปัญหาแต่ละข้อย่อย
+            function renderProblem(scene_param, problem) { 
                 console.log(`Rendering Problem ${currentProblemIndex + 1}:`, problem);
                 if (!problem || !problem.initialObject || !Array.isArray(problem.transformations) || !Array.isArray(problem.options)) {
                     console.error("Critical Error: problem data is invalid/incomplete in renderProblem. Cannot render stage.", problem);
                     return; 
                 }
 
-                if (scene_param.problemElements) { // ✅ ใช้ scene_param
-                    scene_param.problemElements.forEach(el => el.destroy()); // ✅ ใช้ scene_param
+                if (scene_param.problemElements) { 
+                    scene_param.problemElements.forEach(el => el.destroy());
                 }
-                scene_param.problemElements = []; // ✅ ใช้ scene_param
+                scene_param.problemElements = []; 
 
-                // ✅ แสดงกฎการเปลี่ยนแปลง (Rule)
-                const ruleText = scene_param.add.text(config.scale.width / 2, 60, `Rule: ${problem.rule}`, { // ✅ เปลี่ยนเป็นภาษาอังกฤษ
-                    fontSize: '28px', color: '#1e3a8a', fontFamily: 'Kanit, Arial', align: 'center', wordWrap: { width: 800 }
+                const ruleTextTitle = scene_param.add.text(config.scale.width / 2, 40, `โจทย์: ${problem.rule}`, { 
+                    fontSize: '28px', color: '#1e3a8a', fontFamily: 'Kanit, Arial', align: 'center', wordWrap: { width: 800 }, lineSpacing: 0 
                 }).setOrigin(0.5);
-                scene_param.problemElements.push(ruleText);
+                scene_param.problemElements.push(ruleTextTitle); 
 
-                // ✅ แสดงวัตถุเริ่มต้น (Initial Object)
                 const initialObjSize = 120;
-                const initialObjX = 200;
-                const initialObjY = 200;
-                const initialObjectImage = scene_param.add.image(initialObjX, initialObjY, problem.initialObject) // ✅ ใช้ scene_param
-                                                    .setDisplaySize(initialObjSize, initialObjSize);
-                scene_param.problemElements.push(initialObjectImage);
+                let currentObjX = 150; 
+                const currentObjY = 200; 
 
-                // ✅ แสดงลูกศรและกฎการเปลี่ยนแปลง
-                const arrowX = initialObjX + initialObjSize / 2 + 50; 
-                const arrowY = initialObjY;
-                const ruleSpacingY = 40; 
+                // ✅ แสดงวัตถุเริ่มต้น (Initial Object) - บังคับ Scale
+                const initialObjectImage = scene_param.add.image(currentObjX, currentObjY, problem.initialObject) 
+                                                    .setDisplaySize(initialObjSize, initialObjSize)
+                                                    .setScale(1); // ✅ บังคับ Scale เป็น 1.0
+                console.log(`Initial Object "${problem.initialObject}": displaySize(${initialObjectImage.displayWidth}, ${initialObjectImage.displayHeight}), scale(${initialObjectImage.scaleX}, ${initialObjectImage.scaleY})`);
+                scene_param.problemElements.push(initialObjectImage); 
 
+                const horizontalSpacing = 120; 
+                const iconSize = 40; // ขนาดไอคอนกฎ
+                const ruleDescTextSize = 24; // ขนาด Font ของคำอธิบายกฎ
+
+                // ✅ แสดงลูกศรและกฎการเปลี่ยนแปลงพร้อมภาพผลลัพธ์ระหว่างทาง
                 problem.transformations.forEach((transformRule, index) => {
-                    const arrowGraphics = scene_param.add.graphics(); // ✅ ใช้ scene_param
-                    arrowGraphics.lineStyle(3, 0x888888);
-                    arrowGraphics.lineBetween(arrowX, arrowY - 10 + (index * ruleSpacingY), arrowX + 50, arrowY - 10 + (index * ruleSpacingY));
-                    arrowGraphics.lineBetween(arrowX + 50, arrowY - 10 + (index * ruleSpacingY), arrowX + 40, arrowY - 15 + (index * ruleSpacingY));
-                    arrowGraphics.lineBetween(arrowX + 50, arrowY - 10 + (index * ruleSpacingY), arrowX + 40, arrowY - 5 + (index * ruleSpacingY));
-                    scene_param.problemElements.push(arrowGraphics); // ✅ ใช้ scene_param
+                    // ย้ายตำแหน่ง X ไปสำหรับ Icon ลูกศร
+                    currentObjX += initialObjSize / 2 + (horizontalSpacing / 2); 
 
-                    const ruleDescText = scene_param.add.text(arrowX + 80, arrowY - 10 + (index * ruleSpacingY), transformRule, { // ✅ ใช้ scene_param, ข้อความเป็นภาษาอังกฤษ
-                        fontSize: '24px', color: '#666', fontFamily: 'Kanit, Arial'
+                    // สร้าง Icon ลูกศร
+                    const arrowIcon = scene_param.add.image(currentObjX, currentObjY, transformRule.icon)
+                                                .setDisplaySize(iconSize, iconSize);
+                    scene_param.problemElements.push(arrowIcon);
+
+                    // สร้างข้อความกฎ
+                    const ruleDescText = scene_param.add.text(currentObjX + iconSize / 2 + 5, currentObjY, transformRule.rule_desc, { // ปรับตำแหน่งเล็กน้อย
+                        fontSize: `${ruleDescTextSize}px`, color: '#666', fontFamily: 'Kanit, Arial', lineSpacing: 0 
                     }).setOrigin(0, 0.5);
-                    scene_param.problemElements.push(ruleDescText); // ✅ ใช้ scene_param
+                    scene_param.problemElements.push(ruleDescText);
+
+                    // ย้ายตำแหน่ง X ไปสำหรับวัตถุผลลัพธ์
+                    currentObjX += iconSize / 2 + 5 + ruleDescText.width + 50; // ปรับตำแหน่ง X ตามความยาวข้อความ
+
+                    // แสดงภาพผลลัพธ์ของขั้นนี้ - บังคับ Scale
+                    const transformedImage = scene_param.add.image(currentObjX, currentObjY, transformRule.result_image)
+                                                            .setDisplaySize(initialObjSize, initialObjSize)
+                                                            .setScale(1); // ✅ บังคับ Scale เป็น 1.0
+                    console.log(`Transformed Object "${transformRule.result_image}": displaySize(${transformedImage.displayWidth}, ${transformedImage.displayHeight}), scale(${transformedImage.scaleX}, ${transformedImage.scaleY})`);
+                    scene_param.problemElements.push(transformedImage);
                 });
 
-                // ✅ สร้างพื้นที่เป้าหมายสำหรับวางผลลัพธ์ที่คาดการณ์ (Target Drop Zone)
-                const targetX = config.scale.width - 200; 
-                const targetY = initialObjY;
+                // ✅ สร้างพื้นที่เป้าหมายสำหรับวางผลลัพธ์สุดท้ายที่คาดการณ์ (Target Drop Zone)
+                // ตำแหน่ง Target จะอยู่หลังจากภาพสุดท้ายของ Transformation
+                const targetX = currentObjX + initialObjSize / 2 + 50; 
+                const targetY = currentObjY;
                 const targetSize = 120; 
-                const targetOutline = scene_param.add.graphics().lineStyle(4, 0x1e3a8a).strokeRect(targetX - targetSize / 2, targetY - targetSize / 2, targetSize, targetSize); // ✅ ใช้ scene_param
+                const targetOutline = scene_param.add.graphics().lineStyle(4, 0x1e3a8a).strokeRect(targetX - targetSize / 2, targetY - targetSize / 2, targetSize, targetSize); 
                 targetOutline.setDepth(-1); 
-                targetDropZone = scene_param.add.zone(targetX, targetY, targetSize, targetSize).setRectangleDropZone(targetSize, targetSize); // ✅ ใช้ scene_param
+                targetDropZone = scene_param.add.zone(targetX, targetY, targetSize, targetSize).setRectangleDropZone(targetSize, targetSize);
                 targetDropZone.setData({ type: "target_area", isFilled: false });
-                scene_param.problemElements.push(targetOutline, targetDropZone); // ✅ ใช้ scene_param
+                scene_param.problemElements.push(targetOutline, targetDropZone); 
 
-
-                // ✅ แสดงตัวเลือกผลลัพธ์ (Draggable Options)
                 const optionSize = 100;
                 const optionPadding = 40;
                 const totalOptionsWidth = (problem.options.length * optionSize) + ((problem.options.length - 1) * optionPadding);
@@ -253,16 +269,21 @@
                 draggableOptions = []; 
                 problem.options.forEach((optionKey, index) => {
                     const x = optionsStartX + index * (optionSize + optionPadding);
-                    const optionImage = scene_param.add.image(x, optionsY, optionKey) // ✅ ใช้ scene_param
+                    // ✅ สร้างตัวเลือกผลลัพธ์ (Draggable Options) - บังคับ Scale
+                    const optionImage = scene_param.add.image(x, optionsY, optionKey) 
                                             .setDisplaySize(optionSize, optionSize)
-                                            .setInteractive({ useHandCursor: true });
-                    
+                                            .setInteractive({ useHandCursor: true })
+                                            .setScale(1); // ✅ บังคับ Scale เป็น 1.0
+                                            
                     optionImage.setData('originalX', x);
                     optionImage.setData('originalY', optionsY);
                     optionImage.setData('itemType', optionKey); 
 
-                    scene_param.input.setDraggable(optionImage); // ✅ ใช้ scene_param
-                    scene_param.problemElements.push(optionImage); // ✅ ใช้ scene_param
+                    console.log(`Created choice "${optionKey}": displaySize(${optionImage.displayWidth}, ${optionImage.displayHeight}), scale(${optionImage.scaleX}, ${optionImage.scaleY})`);
+                                            
+                    optionImage.setData({ type: "draggable", value: optionKey });
+                    scene_param.input.setDraggable(optionImage); 
+                    scene_param.problemElements.push(optionImage);
                     draggableOptions.push(optionImage);
                 });
                 console.log("Problem rendered. All elements created.");
@@ -280,25 +301,24 @@
             }
 
 
-            function checkProblemCompletion(scene_param) { // ✅ ใช้ scene_param
-                // ปัญหาปัจจุบันสำเร็จเมื่อมีภาพวางใน targetDropZone และถูกต้อง
-                if (targetDropZone.getData('isFilled')) { 
+            function checkProblemCompletion(scene_param) { 
+                if (targetDropZone.getData('isFilled')) {
                     solvedProblems++;
                     console.log(`Problem ${currentProblemIndex + 1} solved! Total solved problems: ${solvedProblems} out of ${problems.length}`);
 
-                    scene_param.time.delayedCall(1000, () => { // ✅ ใช้ scene_param
+                    scene_param.time.delayedCall(1000, () => { 
                         currentProblemIndex++;
                         if (currentProblemIndex < problems.length) {
-                            renderProblem(scene_param, problems[currentProblemIndex]); // ✅ ใช้ scene_param
+                            renderProblem(scene_param, problems[currentProblemIndex]);
                         } else {
-                            onStageComplete(scene_param); // ✅ ใช้ scene_param
+                            onStageComplete(scene_param);
                         }
                     });
                 }
             }
 
             // ✅ ฟังก์ชันเมื่อด่านสำเร็จ
-            function onStageComplete(scene_param) { // ✅ ใช้ scene_param
+            function onStageComplete(scene_param) { 
                 console.log("Stage 9: onStageComplete called.");
                 console.log("DEBUG: onStageComplete - scene_param type:", typeof scene_param, "scene_param value:", scene_param);
                 
@@ -321,28 +341,28 @@
 
                 console.log("Stage 9 Complete! Stars to send:", starsEarned, "Duration:", durationSeconds, "Attempts (wrong answers):", finalAttempts, "Solved Problems:", solvedProblems);
 
-                scene_param.time.delayedCall(800, () => { // ✅ ใช้ scene_param
+                scene_param.time.delayedCall(800, () => { 
                     console.log("DEBUG: inside delayedCall - scene_param type:", typeof scene_param, "scene_param value:", scene_param);
                     
-                    if (scene_param.problemElements) { // ✅ ใช้ scene_param
+                    if (scene_param.problemElements) { 
                         scene_param.problemElements.forEach(el => el.destroy());
                     }
 
-                    const container = scene_param.add.container(config.scale.width / 2, config.scale.height / 2); // ✅ ใช้ scene_param
+                    const container = scene_param.add.container(config.scale.width / 2, config.scale.height / 2); 
                     container.setDepth(10);
                     container.setAlpha(0);
                     container.setScale(0.7);
 
-                    const rect = scene_param.add.rectangle(0, 0, config.scale.width, config.scale.height, 0x000000, 0.7).setInteractive(); // ✅ ใช้ scene_param
+                    const rect = scene_param.add.rectangle(0, 0, config.scale.width, config.scale.height, 0x000000, 0.7).setInteractive(); 
                     container.add(rect);
 
-                    const winText = scene_param.add.text(0, -50, "🎉 ยอดเยี่ยม! ผ่านด่านที่ 9 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5); // ✅ ใช้ scene_param
+                    const winText = scene_param.add.text(0, -50, "🎉 เยี่ยม! ผ่านด่าน 9! 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center', lineSpacing: 0 }).setOrigin(0.5); 
                     container.add(winText);
 
-                    const scoreText = scene_param.add.text(0, 20, `ได้รับ ${starsEarned} ดาว!`, { fontSize: '32px', color: '#ffffff', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5); // ✅ ใช้ scene_param
+                    const scoreText = scene_param.add.text(0, 20, `ได้ ${starsEarned} ดาว!`, { fontSize: '32px', color: '#ffffff', fontFamily: 'Kanit, Arial', align: 'center', lineSpacing: 0 }).setOrigin(0.5); 
                     container.add(scoreText);
 
-                    scene_param.tweens.add({ // ✅ ใช้ scene_param
+                    scene_param.tweens.add({ 
                         targets: container,
                         alpha: 1,
                         scale: 1,
