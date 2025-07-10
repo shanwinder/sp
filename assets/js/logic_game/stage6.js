@@ -1,6 +1,6 @@
 // File: assets/js/logic_game/stage6.js
 // ด่าน 6: แบบรูปตัวอักษร (บทที่ 1: การใช้เหตุผลเชิงตรรกะ)
-// ✅ โค้ดใหม่ รูปแบบ Drag & Drop ตัวอักษร อ้างอิงจากด่าน 1
+// ปรับปรุง: แก้ไข Font Rendering (วรรณยุกต์ซ้อน) ใน Phaser.js ด้วยการทดลอง lineSpacing และ stroke
 
 (function() {
     document.addEventListener('DOMContentLoaded', function() {
@@ -27,65 +27,50 @@
 
         let startTime;     // เวลาเริ่มต้นเล่นด่าน
         let attempts = 0;  // จำนวนครั้งที่พยายามตอบผิด
-        let solvedProblems = 0; // นับจำนวนปัญหาย่อยที่แก้ได้
+        let solvedProblems = 0;
 
-        // ✅ ข้อมูลปัญหา: แบบรูปตัวอักษร, คำตอบที่ถูกต้อง, ตัวเลือก (เพิ่มความยาก)
         const problems = [
-            { // ปัญหาที่ 1: ลำดับ A-B-A-?
+            { // ปัญหาที่ 1
                 sequence: ["A", "B", "A", "?"], 
                 missingIndices: [3], 
                 options: Phaser.Utils.Array.Shuffle(["B", "C", "D", "E"]), 
                 correctAnswers: ["B"]
             },
-            { // ปัญหาที่ 2: ลำดับ A-A-B-B-?
+            { // ปัญหาที่ 2
                 sequence: ["X", "X", "Y", "Y", "?"], 
                 missingIndices: [4],
                 options: Phaser.Utils.Array.Shuffle(["Z", "W", "X", "Y"]),
                 correctAnswers: ["Z"]
             },
-            { // ปัญหาที่ 3: ลำดับ A-B-C-A-?-C (ยาวขึ้น มี 1 ช่องว่าง)
+            { // ปัญหาที่ 3
                 sequence: ["D", "E", "F", "D", "?", "F"], 
                 missingIndices: [4],
                 options: Phaser.Utils.Array.Shuffle(["E", "G", "H", "I"]),
                 correctAnswers: ["E"]
             },
-            { // ปัญหาที่ 4: ลำดับ A, C, E, ? (ก้าวกระโดด)
+            { // ปัญหาที่ 4
                 sequence: ["A", "C", "E", "?"], 
                 missingIndices: [3],
                 options: Phaser.Utils.Array.Shuffle(["F", "G", "H", "I"]),
                 correctAnswers: ["G"] 
             },
-            { // ปัญหาที่ 5: ลำดับยาวขึ้น และมี 2 ช่องว่าง
-                sequence: ["M", "N", "O", "?", "Q", "?", "S"], 
-                missingIndices: [3, 5], 
-                options: Phaser.Utils.Array.Shuffle(["N", "P", "Q", "R"]), 
-                correctAnswers: ["P", "R"] // ต้องแก้เพื่อให้ตรงกับลำดับ N, P (M,N,O,N,M,P,O) หรืออะไรสักอย่าง
-                // ตัวอย่างนี้ต้องการ: M, N, O, N, M, O
-                // ให้ correctAnswers เป็น [N, M]
-                // pattern: ["M", "N", "O", "?", "M", "?"],
-                // correctAnswers: ["N", "M"]
-                // ต้องปรับโจทย์
-            },
-            { // ปัญหาที่ 5 (ปรับแก้): ลำดับยาวขึ้น และมี 2 ช่องว่าง (ตัวอย่าง A,B,C,?,A,?,C)
+            { // ปัญหาที่ 5 (ปรับแก้): ลำดับยาวขึ้น และมี 2 ช่องว่าง
                 sequence: ["A", "B", "C", "?", "A", "?", "C"], 
                 missingIndices: [3, 5], 
-                options: Phaser.Utils.Array.Shuffle(["B", "D", "E", "A"]), 
-                correctAnswers: ["A", "B"] 
+                options: Phaser.Utils.Array.Shuffle(["B", "D", "E", "F"]), 
+                correctAnswers: ["B", "E"] 
             }
         ];
         
-        let dropZones = []; // จะเก็บ Drop Zone ของปัญหาปัจจุบัน
+        let dropZones = [];
 
-        // --- ฟังก์ชัน Preload: โหลดทรัพยากรล่วงหน้า ---
         function preload() {
             console.log("Stage 6: Preload started.");
-            // ไม่ต้องโหลดภาพตัวอักษร เพราะใช้ Phaser.GameObjects.Text โดยตรง
             this.load.audio("correct", "../assets/sound/correct.mp3");
             this.load.audio("wrong", "../assets/sound/wrong.mp3");
             console.log("Stage 6: Assets loaded.");
         }
 
-        // --- ฟังก์ชัน Create: สร้างองค์ประกอบของเกม ---
         function create() {
             console.log("Stage 6: Create started.");
             const scene = this;
@@ -108,11 +93,9 @@
             renderProblem(scene, problems[currentProblemIndex]);
             console.log("Stage 6: Initial problem rendered.");
 
-            // ✅ Event handlers สำหรับการลากและวาง (นำมาจาก stage1.js / stage4.js)
             scene.input.on('dragstart', (pointer, gameObject) => {
                 scene.children.bringToTop(gameObject);
                 gameObject.setTint(0xfff7d6);
-                // สำหรับ Text Object เราจะใช้ setScale แทน setDisplayWidth/Height
                 gameObject.setScale(1.15); // ขยายเล็กน้อยตอนเริ่มลาก
             });
 
@@ -148,17 +131,16 @@
                     const originalX = gameObject.getData('originalX'); 
                     const originalY = gameObject.getData('originalY'); 
 
-                    // แอนิเมชัน "สั่น" อย่างเดียว ภาพคงเดิม
                     scene.tweens.add({
                         targets: gameObject,
-                        x: originalX + 5, // ขยับไปทางขวาเล็กน้อย
-                        yoyo: true,       // ขยับกลับไปมา
-                        repeat: 2,        // ทำซ้ำ 2 ครั้ง (รวมเป็น 3 รอบ)
-                        duration: 50,     // แต่ละการขยับใช้เวลาสั้นๆ
+                        x: originalX + 5, 
+                        yoyo: true,       
+                        repeat: 2,        
+                        duration: 50,     
                         ease: 'Sine.easeInOut', 
                         onComplete: () => {
                             gameObject.setPosition(originalX, originalY); 
-                            gameObject.setScale(1); // บังคับ scale กลับ 1
+                            gameObject.setScale(1); 
                             console.log("Tween complete (Shake). Final position:", gameObject.x, gameObject.y, "Final scale:", gameObject.scaleX);
                         }
                     });
@@ -166,7 +148,7 @@
             });
 
             scene.input.on('dragend', (pointer, gameObject, dropped) => {
-                if (!dropped) { // ถ้าไม่ได้ปล่อยลงใน Drop Zone
+                if (!dropped) {
                     gameObject.clearTint();
                     scene.tweens.add({
                         targets: gameObject,
@@ -179,7 +161,6 @@
         }
 
 
-        // ✅ ฟังก์ชันสำหรับแสดงปัญหาแต่ละข้อย่อย (ปรับปรุงการคำนวณ Layout)
         function renderProblem(scene, problem) {
             console.log(`Rendering Problem ${currentProblemIndex + 1}:`, problem);
             if (!problem || !Array.isArray(problem.sequence)) {
@@ -193,16 +174,16 @@
             scene.problemElements = [];
 
             const titleText = scene.add.text(config.scale.width / 2, 80, `ปัญหาที่ ${currentProblemIndex + 1} จาก ${problems.length}`, { 
-                fontSize: '32px', color: '#1e3a8a', fontFamily: 'Kanit, Arial' 
+                fontSize: '32px', color: '#1e3a8a', fontFamily: 'Kanit, Arial', lineSpacing: 0 // ✅ lineSpacing
             }).setOrigin(0.5);
             scene.problemElements.push(titleText);
 
             const maxUsablePatternWidth = config.scale.width - 100;
-            const minCharSize = 50; // ขนาดตัวอักษรขั้นต่ำสุด
-            const minPadding = 5;   // ระยะห่างขั้นต่ำสุด
+            const minCharSize = 50; 
+            const minPadding = 5;   
 
-            let currentCharSize = 80; // ขนาดตัวอักษรเริ่มต้นที่ต้องการ
-            let currentCharPadding = 30; // ระยะห่างเริ่มต้นที่ต้องการ
+            let currentCharSize = 80; 
+            let currentCharPadding = 30; 
 
             const numItems = problem.sequence.length;
 
@@ -233,10 +214,9 @@
 
             dropZones = []; 
 
-            problem.sequence.forEach((charKey, index) => { // ใช้ charKey สำหรับตัวอักษร
+            problem.sequence.forEach((charKey, index) => {
                 const x = patternStartX + index * (currentCharSize + currentCharPadding);
                 if (charKey === "?") {
-                    // สร้างช่องว่างสำหรับเติม (กรอบสี่เหลี่ยม)
                     const outline = scene.add.graphics().lineStyle(3, 0x6b7280).strokeRect(x - currentCharSize / 2, patternY - currentCharSize / 2, currentCharSize, currentCharSize);
                     const dropZone = scene.add.zone(x, patternY, currentCharSize, currentCharSize).setRectangleDropZone(currentCharSize, currentCharSize); 
                     dropZone.setData({ 
@@ -249,13 +229,21 @@
                     scene.problemElements.push(outline, dropZone); 
                     dropZones.push(dropZone); 
                 } else {
-                    // ✅ สร้างเป็น Phaser.GameObjects.Text
                     const charText = scene.add.text(x, patternY, charKey, { 
-                        fontSize: `${currentCharSize * 0.8}px`, // ปรับขนาดตัวอักษรตามขนาดช่อง
+                        fontSize: `${currentCharSize * 0.8}px`, 
                         color: '#0c4a6e', 
-                        fontFamily: 'Kanit, Arial' 
+                        fontFamily: 'Kanit, Arial',
+                        lineSpacing: -10 // ✅ lineSpacing (ค่าเดิมที่ลองแล้วยังไม่ได้ผล)
+                        // ✅ ทดลองค่า lineSpacing อื่นๆ:
+                        // lineSpacing: 0,   // ค่าเริ่มต้น
+                        // lineSpacing: 5,   // ลองค่าบวกเล็กน้อย
+                        // lineSpacing: -5,  // ลองค่าลบเล็กน้อย
+                        // lineSpacing: -15, // ลองค่าลบที่มากขึ้น
+                        // ✅ เพิ่ม stroke เพื่อดูขอบเขตของข้อความ (สำหรับ Debug)
+                        // stroke: '#ff00ff', // สีม่วง
+                        // strokeThickness: 2 
                     }).setOrigin(0.5);
-                    console.log(`Created pattern char "${charKey}": fontSize(${charText.style.fontSize}), scale(${charText.scaleX}, ${charText.scaleY})`);
+                    console.log(`Created pattern char "${charKey}": fontSize(${charText.style.fontSize}), scale(${charText.scaleX}, ${charText.scaleY}), height: ${charText.height}`); // เพิ่ม height log
                     scene.problemElements.push(charText);
                 }
             });
@@ -266,22 +254,25 @@
             const choicesStartX = (config.scale.width - totalChoicesWidth) / 2 + choiceSize / 2;
             const choicesY = 450;
 
-            problem.options.forEach((choiceKey, index) => { // ใช้ choiceKey สำหรับตัวอักษร
+            problem.options.forEach((choiceKey, index) => {
                 const x = choicesStartX + index * (choiceSize + choicePadding);
-                // ✅ สร้างเป็น Phaser.GameObjects.Text
                 const choiceText = scene.add.text(x, choicesY, choiceKey, { 
-                                        fontSize: `${choiceSize * 0.8}px`, // ปรับขนาดตัวอักษรตามขนาดช่อง
+                                        fontSize: `${choiceSize * 0.8}px`, 
                                         color: '#0c4a6e', 
-                                        fontFamily: 'Kanit, Arial' 
+                                        fontFamily: 'Kanit, Arial',
+                                        lineSpacing: -10 // ✅ lineSpacing
+                                        // ✅ เพิ่ม stroke เพื่อดูขอบเขตของข้อความ (สำหรับ Debug)
+                                        // stroke: '#ff00ff', 
+                                        // strokeThickness: 2 
                                     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
                                         
                 choiceText.setData('originalX', x);
                 choiceText.setData('originalY', choicesY);
 
-                console.log(`Created choice "${choiceKey}": fontSize(${choiceText.style.fontSize}), scale(${choiceText.scaleX}, ${choiceText.scaleY})`);
+                console.log(`Created choice "${choiceKey}": fontSize(${choiceText.style.fontSize}), scale(${choiceText.scaleX}, ${choiceText.scaleY}), height: ${choiceText.height}`); // เพิ่ม height log
                                         
                 choiceText.setData({ type: "draggable", value: choiceKey });
-                scene.input.setDraggable(choiceText); // ทำให้ลากได้
+                scene.input.setDraggable(choiceText);
                 scene.problemElements.push(choiceText);
             });
             console.log("Problem rendered. All choices created.");
@@ -318,8 +309,10 @@
         }
 
 
-        function onStageComplete(scene) {
+        function onStageComplete(scene_param) { 
             console.log("Stage 6: onStageComplete called.");
+            console.log("DEBUG: onStageComplete - scene_param type:", typeof scene_param, "scene_param value:", scene_param);
+            
             const endTime = Date.now();
             const durationSeconds = Math.floor((endTime - startTime) / 1000);
             let starsEarned = 0;
@@ -339,26 +332,28 @@
 
             console.log("Stage 6 Complete! Stars to send:", starsEarned, "Duration:", durationSeconds, "Attempts (wrong answers):", finalAttempts, "Solved Problems:", solvedProblems);
 
-            scene.time.delayedCall(800, () => {
-                if (scene.problemElements) {
-                    scene.problemElements.forEach(el => el.destroy());
+            scene_param.time.delayedCall(800, () => { 
+                console.log("DEBUG: inside delayedCall - scene_param type:", typeof scene_param, "scene_param value:", scene_param);
+                
+                if (scene_param.problemElements) { 
+                    scene_param.problemElements.forEach(el => el.destroy());
                 }
 
-                const container = scene.add.container(config.scale.width / 2, config.scale.height / 2);
+                const container = scene_param.add.container(config.scale.width / 2, config.scale.height / 2); 
                 container.setDepth(10);
                 container.setAlpha(0);
                 container.setScale(0.7);
 
-                const rect = scene.add.rectangle(0, 0, config.scale.width, config.scale.height, 0x000000, 0.7).setInteractive();
+                const rect = scene_param.add.rectangle(0, 0, config.scale.width, config.scale.height, 0x000000, 0.7).setInteractive(); 
                 container.add(rect);
 
-                const winText = scene.add.text(0, -50, "🎉 ยอดเยี่ยม! ผ่านด่านที่ 6 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center' }).setOrigin(0.5);
+                const winText = scene_param.add.text(0, -50, "🎉 ยอดเยี่ยม! ผ่านด่านที่ 6 🎉", { fontSize: '48px', color: '#fde047', fontFamily: 'Kanit, Arial', align: 'center', lineSpacing: 0 }).setOrigin(0.5); 
                 container.add(winText);
 
-                const scoreText = scene.add.text(0, 20, `ได้รับ ${starsEarned} ดาว!`, { fontSize: '32px', color: '#ffffff', fontFamily: 'Kanit, Arial' }).setOrigin(0.5);
+                const scoreText = scene_param.add.text(0, 20, `ได้รับ ${starsEarned} ดาว!`, { fontSize: '32px', color: '#ffffff', fontFamily: 'Kanit, Arial', align: 'center', lineSpacing: 0 }).setOrigin(0.5); 
                 container.add(scoreText);
 
-                scene.tweens.add({
+                scene_param.tweens.add({ 
                     targets: container,
                     alpha: 1,
                     scale: 1,
@@ -373,5 +368,5 @@
 
         new Phaser.Game(config);
 
-    });
-})();
+    }); // End document.fonts.ready.then
+})(); // End IIFE
