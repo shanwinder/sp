@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="0.31181445"
-     inkscape:cx="1043.8901"
-     inkscape:cy="607.73323"
+     inkscape:cx="1042.2865"
+     inkscape:cy="607.73322"
      inkscape:window-width="1366"
      inkscape:window-height="697"
      inkscape:window-x="-8"
@@ -145,8 +145,8 @@
        cy="185.05467"
        r="32.43573"
        inkscape:export-filename="img\objects\green_circle_large.webp"
-       inkscape:export-xdpi="78.308701"
-       inkscape:export-ydpi="78.308701" />
+       inkscape:export-xdpi="58.731514"
+       inkscape:export-ydpi="58.731514" />
     <rect
        style="display:inline;fill:#f1c40f;fill-opacity:1;stroke:none;stroke-width:0.619357;stroke-dasharray:none;stroke-opacity:1"
        id="rect2-9"
@@ -154,7 +154,7 @@
        height="64.800003"
        x="302.94131"
        y="216.26189"
-       inkscape:export-filename="img\yellow_square.webp"
+       inkscape:export-filename="img\objects\yellow_square.webp"
        inkscape:export-xdpi="39.197521"
        inkscape:export-ydpi="39.197521" />
     <circle
@@ -205,8 +205,8 @@
        inkscape:transform-center-y="2.7030294e-06"
        transform="matrix(0,0.53633157,-0.53633157,0,159.44784,-24.990446)"
        inkscape:export-filename="img\objects\blue_triangle_normal.webp"
-       inkscape:export-xdpi="67.878578"
-       inkscape:export-ydpi="67.878578"
+       inkscape:export-xdpi="39.189709"
+       inkscape:export-ydpi="39.189709"
        inkscape:transform-center-x="-10.802151" />
     <path
        sodipodi:type="star"
@@ -247,8 +247,8 @@
        inkscape:transform-center-y="2.7030294e-06"
        transform="matrix(0,0.53633157,0.53633157,0,156.29403,-69.113909)"
        inkscape:export-filename="img\objects\blue_triangle_flipped.webp"
-       inkscape:export-xdpi="67.878578"
-       inkscape:export-ydpi="67.878578"
+       inkscape:export-xdpi="39.189713"
+       inkscape:export-ydpi="39.189713"
        inkscape:transform-center-x="10.802146" />
     <rect
        style="fill:#e74c3c;fill-opacity:1;stroke:none;stroke-width:0.619357;stroke-dasharray:none;stroke-opacity:1"
