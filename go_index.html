@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="refresh" content="5; url=https://compsciskills.great-site.net/">
+    
+    <title>กำลังเข้าสู่... ระบบแบบฝึกทักษะวิทยาการคำนวณ ป.4</title>
+    
+    <style>
+        body {
+            font-family: 'Kanit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            padding: 2rem;
+        }
+        h1 {
+            color: #005a9c;
+        }
+        #countdown {
+            font-weight: bold;
+            color: #d9534f;
+            font-size: 1.2em;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 กำลังนำท่านเข้าสู่ระบบแบบฝึกทักษะวิทยาการคำนวณ ป.4</h1>
+
+        <p>จะนำทางในอีก <span id="countdown">5</span> วินาที</p>
+        
+        <p>
+            หากหน้าเว็บไม่เปลี่ยนไปโดยอัตโนมัติ
+            <a href="https://compsciskills.great-site.net/">กรุณาคลิกที่นี่เพื่อเข้าสู่เกม</a>.
+        </p>
+    </div>
+
+    <script>
+        // กำหนดเวลาเริ่มต้นที่ 5 วินาที
+        let timeLeft = 5;
+        
+        // หา element ที่จะใช้แสดงตัวเลข
+        const countdownElement = document.getElementById('countdown');
+        
+        // เริ่มนับถอยหลังทุกๆ 1 วินาที (1000 มิลลิวินาที)
+        const timer = setInterval(function() {
+            // ลดเวลาลง 1
+            timeLeft--;
+            
+            // แสดงผลเวลาที่เหลือ
+            countdownElement.textContent = timeLeft;
+            
+            // เมื่อเวลาน้อยกว่าหรือเท่ากับ 0 ให้หยุดนับ
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>
