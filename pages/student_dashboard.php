@@ -336,31 +336,23 @@ function getGameProgress($conn, $user_id, $game_id)
         </p>
         <div class="game-list" role="list" aria-label="รายการแบบฝึกหัดเกม">
             <?php foreach ($games as $game_id => $game):
-                $progress = getGameProgress($conn, $user_id, $game_id);
-                $percent = ($progress['total'] > 0) ? round(($progress['passed'] / $progress['total']) * 100) : 0;
-                $bg = "../assets/img/cards/" . $game['code'] . ".png";
+    $progress = getGameProgress($conn, $user_id, $game_id);
+    $percent = ($progress['total'] > 0) ? round(($progress['passed'] / $progress['total']) * 100) : 0;
+    $bg = "../assets/img/cards/" . $game['code'] . ".png";
 
-                if ($game_id == 1) {
-                    $link = "stage_logic_1.php";
-                } else {
-                    $link = "stage.php?game_id=$game_id&stage=1";
-                }
-                ?>
-                <a href="<?= $link ?>" class="game-card" style="background-image: url('<?= $bg ?>');"
-                    title="<?= htmlspecialchars($game['title']) ?>">
+    if ($game_id == 1) {
+        $link = "stage_logic_1.php";
+    } else {
+        $link = "stage.php?game_id=$game_id&stage=1";
+    }
+    ?>
+    <a href="<?= $link ?>" class="game-card" style="background-image: url('<?= $bg ?>');"
+        title="<?= htmlspecialchars($game['title']) ?>">
 
-                    <div class="game-overlay">
-                        <div class="game-code"><?= htmlspecialchars($game['code']) ?></div>
-                        <div class="progress-info">
-                            ด่านที่ทำสำเร็จ: <?= $progress['passed'] ?>/<?= $progress['total'] ?><br>
-                            ดาวรวม: <?= $progress['score'] ?> 🌟
-                            <div class="progress-bar">
-                                <div class="progress-bar-fill" style="width: <?= $percent ?>%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            <?php endforeach; ?>
+        <div class="game-overlay">
+            </div>
+    </a>
+<?php endforeach; ?>
         </div>
     </main>
 
