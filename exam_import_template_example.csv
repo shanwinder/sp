@@ -1,0 +1,4 @@
+﻿unit,question_text,question_image,difficulty,active,choice1_text,choice1_image,choice1_correct,choice2_text,choice2_image,choice2_correct,choice3_text,choice3_image,choice3_correct,choice4_text,choice4_image,choice4_correct
+flowchart,สัญลักษณ์ใดหมายถึงจุดเริ่มต้น/สิ้นสุดของผังงาน,,1,1,วงรี (Terminator),,1,สี่เหลี่ยมผืนผ้า (Process),,0,รูปสี่เหลี่ยมขนมเปียกปูน (Decision),,0,สี่เหลี่ยมด้านขนาน (Input/Output),,0
+pseudocode,รหัสจำลองใดต่อไปนี้พิมพ์เลข 1 ถึง 3 ตามลำดับ,,2,1,FOR i ← 1 TO 3 DO PRINT i,,1,FOR i ← 3 TO 1 DO PRINT 3,,0,PRINT 1; PRINT 1; PRINT 1,,0,WHILE i < 3 DO i ← i - 1,,0
+algorithm,ลำดับขั้นตอนใดถูกต้องสำหรับการทำแซนด์วิช (เลือกคำตอบที่สื่อถึงลำดับจากต้นจนจบ),,1,1,เตรียมขนมปัง → ทาซอส → วางไส้ → ประกบ → เสิร์ฟ,,1,วางไส้ → ประกบ → ทาซอส → เสิร์ฟ → เตรียมขนมปัง,,0,เสิร์ฟ → เตรียมขนมปัง → ทาซอส → วางไส้ → ประกบ,,0,ทาซอส → เสิร์ฟ → วางไส้ → ประกบ → เตรียมขนมปัง,,0

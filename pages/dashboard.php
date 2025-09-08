@@ -97,7 +97,8 @@ $result = $conn->query($sql);
 <p>
   <a href="add_user.php" class="btn btn-success btn-sm">+ เพิ่มนักเรียน</a>
   <a href="import_students.php" class="btn btn-primary btn-sm">+ นำเข้านักเรียน</a>
-    <a href="leaderboard.php" class="btn btn-info btn-sm">🏆 Leader Board</a>
+  <a href="admin_import_questions.php" class="btn btn-primary btn-sm">+ นำเข้าข้อสอบ</a>
+  <a href="leaderboard.php" class="btn btn-info btn-sm">🏆 Leader Board</a>
 </p>
 
 <form method="post" action="delete_multiple_users.php" onsubmit="return confirm('คุณแน่ใจหรือไม่ที่จะลบผู้ใช้ที่เลือก?');">
