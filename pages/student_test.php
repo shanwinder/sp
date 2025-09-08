@@ -1,23 +1,24 @@
 <?php
 /* ======================================================================
-   student_test.php  —  แบบทดสอบก่อน/หลังเรียน (Bootstrap 5, PHP/MySQL)
+   pages/student_test.php — แบบทดสอบก่อน/หลังเรียน (Bootstrap 5, PHP/MySQL)
+   - คงเลย์เอาต์เดิมของหน้านี้ (ไม่ include game_header.php)
+   - ใช้ requireStudent() เช่นเดียวกับหน้าเกม ป้องกันเด้งไปหน้า Login
+   - ปุ่ม "แดชบอร์ด" ใช้ URL จาก session เหมือนระบบเกม (ถ้ามี) + fallback ตรวจไฟล์จริง
+   - รองรับรูปภาพในคำถาม/ตัวเลือก (image_path) โดยตรวจ schema อัตโนมัติ
+   - บันทึกผลลงตาราง test_attempts / test_answers
    ====================================================================== */
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-// ---- ROOT & DB ----
-define('APP_ROOT', dirname(__DIR__)); // ไฟล์นี้อยู่ใน /pages → ถอยขึ้นไป / แล้วเข้าหา includes
-$DB_FILE = APP_ROOT . '/includes/db.php';
-if (!is_file($DB_FILE)) {
-  http_response_code(500);
-  exit("ไม่พบไฟล์เชื่อมต่อฐานข้อมูล: " . htmlspecialchars($DB_FILE));
-}
-require_once $DB_FILE;   // ต้องได้ตัวแปร $conn (mysqli) กลับมา
+require_once '../includes/auth.php';
+require_once '../includes/db.php';
+requireStudent(); // จำกัดเฉพาะนักเรียนที่ล็อกอินแล้วเท่านั้น
 
-// ปิดแสดง error บนหน้า (ให้บันทึกลง log แทน)
+// ไม่โชว์ error บนหน้า (ให้ไปที่ error log)
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-// --------- Helpers ----------
+/* ---------------- Helpers ---------------- */
 function csrf_token(): string {
   if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(32));
   return $_SESSION['csrf'];
@@ -31,7 +32,7 @@ function bind_params_refs(mysqli_stmt $stmt, string $types, array $values): void
   foreach ($values as $i => $v) { $params[] = &$values[$i]; }
   call_user_func_array([$stmt, 'bind_param'], $params);
 }
-/** ตรวจว่าตารางมีคอลัมน์หรือไม่ (รองรับโหมดมี/ไม่มี image_path อัตโนมัติ) */
+/** ตรวจว่าตารางมีคอลัมน์หรือไม่ */
 function has_column(mysqli $conn, string $table, string $column): bool {
   $sql = "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ? LIMIT 1";
@@ -40,40 +41,102 @@ function has_column(mysqli $conn, string $table, string $column): bool {
   $st->execute();
   return (bool)$st->get_result()->fetch_row();
 }
+/** ตรวจว่ามีตารางหรือไม่ (ใช้ตอนพยายามอ่านชื่อผู้เรียนจาก DB) */
+function has_table(mysqli $conn, string $table): bool {
+  $sql = "SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? LIMIT 1";
+  $st = $conn->prepare($sql);
+  $st->bind_param('s', $table);
+  $st->execute();
+  return (bool)$st->get_result()->fetch_row();
+}
+/** ดึงชื่อผู้เรียนแบบยืดหยุ่น: เอาจาก SESSION ก่อน แล้วค่อยลอง DB ถ้ามี */
+function resolve_student_name(mysqli $conn): string {
+  foreach (['display_name','full_name','student_name','name','username'] as $k) {
+    if (!empty($_SESSION[$k])) return (string)$_SESSION[$k];
+  }
+  $first = $_SESSION['first_name'] ?? $_SESSION['firstname'] ?? null;
+  $last  = $_SESSION['last_name']  ?? $_SESSION['lastname']  ?? null;
+  if ($first || $last) return trim(($first ?? '').' '.($last ?? ''));
 
-// --------- ชื่อเว็บ/ผู้เรียน/แดชบอร์ด ----------
-$SITE_TITLE  = 'แบบฝึกทักษะวิทยาการคำนวณ ป.4';
-$studentName = $_SESSION['display_name']
-  ?? $_SESSION['full_name']
-  ?? $_SESSION['student_name']
-  ?? $_SESSION['username']
-  ?? 'นักเรียน';
+  $uid = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+  if ($uid > 0) {
+    if (has_table($conn, 'students')) {
+      foreach ([
+        "SELECT full_name AS n FROM students WHERE id=?",
+        "SELECT CONCAT(first_name,' ',last_name) AS n FROM students WHERE id=?",
+        "SELECT name AS n FROM students WHERE id=?",
+      ] as $sql) {
+        $st = $conn->prepare($sql); $st->bind_param('i',$uid); $st->execute();
+        $n = $st->get_result()->fetch_assoc()['n'] ?? null; if (!empty($n)) return (string)$n;
+      }
+    }
+    if (has_table($conn, 'users')) {
+      foreach ([
+        "SELECT full_name AS n FROM users WHERE id=?",
+        "SELECT CONCAT(first_name,' ',last_name) AS n FROM users WHERE id=?",
+        "SELECT name AS n FROM users WHERE id=?",
+        "SELECT username AS n FROM users WHERE id=?",
+      ] as $sql) {
+        $st = $conn->prepare($sql); $st->bind_param('i',$uid); $st->execute();
+        $n = $st->get_result()->fetch_assoc()['n'] ?? null; if (!empty($n)) return (string)$n;
+      }
+    }
+  }
+  return 'นักเรียน';
+}
+/** ตัวอักษรหน้าชื่อ (สำหรับ avatar วงกลม) */
+function thai_initial(string $name): string {
+  $ch = mb_substr(trim($name), 0, 1, 'UTF-8');
+  return mb_strtoupper($ch, 'UTF-8');
+}
+/** หา URL แดชบอร์ด: ยึดค่าจาก session ตามระบบเกม, ถ้าไม่มีให้ fallback เฉพาะไฟล์ที่มีอยู่จริง */
+function pick_dashboard_url(): string {
+  // ใช้ค่าเดียวกับ header ของระบบเกมถ้าเคยตั้งไว้
+  if (!empty($_SESSION['student_dashboard_url'])) return (string)$_SESSION['student_dashboard_url'];
+  if (!empty($_SESSION['dashboard_url'])) return (string)$_SESSION['dashboard_url'];
 
-$dashboardUrl = 'dashboard.php';
-if (!is_file(APP_ROOT . '/pages/' . $dashboardUrl)) {
-  $dashboardUrl = 'index.php';
+  // ตรวจหาไฟล์จริงในโปรเจกต์ (relative จากโฟลเดอร์ /pages)
+  $candidates = [
+    '../student/dashboard.php',
+    '../pages/student_dashboard.php',
+    '../dashboard.php',
+    '../home.php',
+    'dashboard.php',
+    'index.php', // ใช้เฉพาะกรณี index ของ "แดชบอร์ด" จริง ไม่ใช่หน้า login
+  ];
+  foreach ($candidates as $p) {
+    $abs = realpath(__DIR__ . '/' . $p);
+    if ($abs && is_file($abs)) return $p;
+  }
+  // ทางหนีไฟ: กลับหน้าก่อนหน้า (เลี่ยงการชี้ไป login)
+  return 'javascript:history.back()';
 }
 
-// --------- พารามิเตอร์หลักของหน้า ----------
+/* ---------------- ค่าหน้า ---------------- */
+$SITE_TITLE   = 'แบบฝึกทักษะวิทยาการคำนวณ ป.4';
+$studentName  = resolve_student_name($conn);
+$initial      = thai_initial($studentName);
+$dashboardUrl = pick_dashboard_url();
+
 $typeParam = strtolower(trim($_GET['type'] ?? 'pre'));
 $testType  = ($typeParam === 'post') ? 'post' : 'pre';
 $title     = ($testType === 'pre') ? 'แบบทดสอบก่อนเรียน' : 'แบบทดสอบหลังเรียน';
 $QUESTION_COUNT = 30;
 
-// ถ้ามีระบบ login อยู่แล้วจะดึง user_id จาก session; หากไม่มีจะเป็น 0 ได้
 $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
 
-// ตรวจสคีมาว่ามีคอลัมน์ image_path ไหม
+// ตรวจ schema ว่ามี image_path หรือไม่
 $hasQImage = has_column($conn, 'questions', 'image_path');
 $hasCImage = has_column($conn, 'choices',   'image_path');
 
-// --------- โฟลว์ของหน้า (GET: แสดงข้อสอบ, POST: ตรวจและสรุป) ----------
+/* ---------------- โฟลว์หลัก ---------------- */
 $view = 'form';     // 'form' | 'result' | 'not_enough'
-$questions = [];    // qid => ['text','qimg','choices'=>[['cid','text','cimg'],...]]
-$attempt = null;    // array สรุปผลหลังส่ง
+$questions = [];    // โครงสร้าง: [qid => ['text','qimg','choices'=>[['cid','text','cimg'], ...]]]
+$attempt = null;    // ข้อมูลสรุปผลหลังส่ง
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-  // เริ่มชุดใหม่
+  // เริ่มเซสชันทดสอบใหม่
   unset($_SESSION['test_qids'], $_SESSION['test_started_at'], $_SESSION['test_type']);
 
   // สุ่ม ID คำถาม
@@ -93,16 +156,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $inQ   = implode(',', array_fill(0, count($qids), '?'));
     $types = str_repeat('i', count($qids));
 
+    // ใส่ backtick รอบคอลัมน์ `text`
     if ($hasQImage && $hasCImage) {
-      $sql = "SELECT q.id AS qid, q.text AS qtext, q.image_path AS qimg,
-                     c.id AS cid, c.text AS ctext, c.image_path AS cimg
+      $sql = "SELECT q.id AS qid, q.`text` AS qtext, q.image_path AS qimg,
+                     c.id AS cid, c.`text` AS ctext, c.image_path AS cimg
               FROM questions q
               JOIN choices   c ON c.question_id = q.id
               WHERE q.id IN ($inQ)
               ORDER BY q.id, RAND()";
     } else {
-      $sql = "SELECT q.id AS qid, q.text AS qtext, NULL AS qimg,
-                     c.id AS cid, c.text AS ctext, NULL AS cimg
+      $sql = "SELECT q.id AS qid, q.`text` AS qtext, NULL AS qimg,
+                     c.id AS cid, c.`text` AS ctext, NULL AS cimg
               FROM questions q
               JOIN choices   c ON c.question_id = q.id
               WHERE q.id IN ($inQ)
@@ -144,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
   }
 
-  $answers = $_POST['q'] ?? [];    // q[question_id] = choice_id
+  $answers  = $_POST['q'] ?? [];    // q[question_id] = choice_id
   $maxScore = count($qids);
 
   $inQ   = implode(',', array_fill(0, count($qids), '?'));
@@ -213,88 +277,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   <style>
     :root{
-      --brand1:#6f9cff; /* ฟ้า */
-      --brand2:#ffd166; /* เหลืองพาสเทล */
-      --brand3:#06d6a0; /* เขียวมิ้นต์ */
-      --brand4:#f78c6b; /* ส้มพีช */
-      --brand5:#cdb4db; /* ม่วงพาสเทล */
+      --brand1:#6f9cff; --brand2:#ffd166; --brand3:#06d6a0; --brand4:#f78c6b; --brand5:#cdb4db;
       --card-radius: 18px;
     }
     body{
       background: linear-gradient(180deg, #f8fbff 0%, #ffffff 45%, #fff9f3 100%);
+      font-family: 'Kanit', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans Thai', sans-serif;
     }
-    .navbar{
-      background: linear-gradient(90deg, #ffffff 0%, #f8fbff 100%) !important;
-    }
-    .brand-title{
-      font-weight: 700;
-      color:#1f3f68;
-    }
+    .navbar{ background: linear-gradient(90deg, #ffffff 0%, #f8fbff 100%) !important; }
+    .brand-title{ font-weight: 700; color:#1f3f68; }
     .user-pill{
-      background:#eef5ff;
-      color:#1f3f68;
-      border-radius:999px;
-      padding:.25rem .75rem;
-      font-weight:600;
-      display:inline-flex; align-items:center; gap:.5rem;
+      background:#eef5ff; color:#1f3f68; border-radius:999px; padding:.25rem .75rem;
+      font-weight:600; display:inline-flex; align-items:center; gap:.5rem;
     }
     .user-avatar{
       width:26px; height:26px; border-radius:50%;
       background:#6f9cff; color:#fff; display:inline-flex; align-items:center; justify-content:center;
       font-size:.9rem; font-weight:700;
     }
-
     .question-card{
-      border: none;
-      border-radius: var(--card-radius);
-      box-shadow: 0 6px 18px rgba(31,63,104,.08);
-      overflow: hidden;
-      position: relative;
-      transition: transform .05s ease;
+      border: none; border-radius: var(--card-radius);
+      box-shadow: 0 6px 18px rgba(31,63,104,.08); overflow: hidden; position: relative;
     }
-    .question-card:hover{ transform: translateY(-1px); }
-    .question-card::before{
-      content:"";
-      position:absolute; inset:0 auto 0 0;
-      width:10px; background: var(--accent, var(--brand1));
-    }
+    .question-card::before{ content:""; position:absolute; inset:0 auto 0 0; width:10px; background: var(--accent, var(--brand1)); }
     .question-card:nth-of-type(5n+1){ --accent: var(--brand1); }
     .question-card:nth-of-type(5n+2){ --accent: var(--brand2); }
     .question-card:nth-of-type(5n+3){ --accent: var(--brand3); }
     .question-card:nth-of-type(5n+4){ --accent: var(--brand4); }
     .question-card:nth-of-type(5n+5){ --accent: var(--brand5); }
-
     .card-title{ font-weight: 700; color:#1f3f68; }
     .choice-item{
-      border: 2px solid rgba(31,63,104,.08) !important;
-      border-radius: 12px;
-      background: #fff;
-      transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
-      cursor:pointer;
+      border: 2px solid rgba(31,63,104,.08) !important; border-radius: 12px; background: #fff;
+      transition: box-shadow .15s, border-color .15s, background-color .15s; cursor:pointer;
     }
-    .choice-item:hover{
-      box-shadow: 0 6px 16px rgba(31,63,104,.08);
-      background: #f9fbff;
-    }
-    .choice-item.selected{
-      border-color: var(--accent, var(--brand1)) !important;
-      background: #f7fbff;
-      box-shadow: 0 8px 18px rgba(31,63,104,.10);
-    }
+    .choice-item:hover{ box-shadow: 0 6px 16px rgba(31,63,104,.08); background: #f9fbff; }
+    .choice-item.selected{ border-color: var(--accent, var(--brand1)) !important; background: #f7fbff; }
     .form-check-input{ transform: scale(1.25); margin-top:.5rem; }
     .question-image, .choice-image{ max-width:100%; height:auto; border-radius: 10px; }
     .sticky-submit{ position:sticky; bottom:0; z-index:1030; background:#fff; }
     .sticky-submit .btn{ padding:.7rem 1.1rem; font-weight:600; border-radius: 12px; }
-
     .progress{ background:#eaf2ff; border-radius: 999px; box-shadow: inset 0 1px 2px rgba(0,0,0,.05); }
     .progress-bar{ background: linear-gradient(90deg, var(--brand3), var(--brand1)); }
-
     .meta-pill{
-      background:#eef5ff;
-      color:#1f3f68;
-      border-radius: 999px;
-      padding:.25rem .75rem;
-      font-weight:600;
+      background:#eef5ff; color:#1f3f68; border-radius: 999px; padding:.25rem .75rem; font-weight:600;
     }
     footer.site-footer{ border-top: 1px solid rgba(0,0,0,.06); background:#fff; }
   </style>
@@ -306,9 +331,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <span class="navbar-brand brand-title"><?= htmlspecialchars($SITE_TITLE) ?></span>
     <div class="ms-auto d-flex align-items-center gap-2">
       <a class="btn btn-outline-secondary btn-sm" href="<?= htmlspecialchars($dashboardUrl) ?>">← แดชบอร์ด</a>
-      <?php
-        $initial = mb_strtoupper(mb_substr($studentName,0,1,'UTF-8'),'UTF-8');
-      ?>
       <span class="user-pill">
         <span class="user-avatar"><?= htmlspecialchars($initial) ?></span>
         <span class="d-none d-sm-inline"><?= htmlspecialchars($studentName) ?></span>
@@ -419,12 +441,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 </div>
 
 <?php
-// ===== Footer สำคัญมาก: แทรก footer ของระบบถ้ามี =====
-$FOOT = APP_ROOT . '/includes/footer.php';
+// Footer นักเรียน (ใช้ของระบบเดิม ถ้ามี)
+$FOOT = dirname(__DIR__) . '/includes/student_footer.php';
 if (is_file($FOOT)) {
   include $FOOT;
 } else {
-  // fallback footer (กรณีไม่มีไฟล์ footer.php ป้องกันหน้าโล่ง)
   echo '<footer class="site-footer py-4 mt-5"><div class="container small text-muted">© '.date('Y').' • แบบฝึกทักษะวิทยาการคำนวณ ป.4 • ระบบทดสอบเพื่อการเรียนรู้</div></footer>';
 }
 ?>
@@ -462,7 +483,7 @@ if (is_file($FOOT)) {
   document.querySelectorAll('input[type=radio]').forEach(r=>{
     r.addEventListener('change', recalc);
     r.addEventListener('change', markSelected);
-    if (r.checked) { r.dispatchEvent(new Event('change')); }
+    if (r.checked) r.dispatchEvent(new Event('change'));
   });
   recalc();
 
