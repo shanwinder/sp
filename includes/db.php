@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
 $user = 'root';
-$pass = 'root';
+$pass = '';
 $db   = 'learning_game'; // ให้ชื่อฐานข้อมูลตรงกับของคุณ
 
 $conn = new mysqli($host, $user, $pass, $db);

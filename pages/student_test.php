@@ -1,18 +1,18 @@
 <?php
 /* ======================================================================
-   pages/student_test.php — แบบทดสอบก่อน/หลังเรียน (Bootstrap 5, PHP/MySQL)
-   - คงเลย์เอาต์เดิมของหน้านี้ (ไม่ include game_header.php)
-   - ใช้ requireStudent() เช่นเดียวกับหน้าเกม ป้องกันเด้งไปหน้า Login
-   - ปุ่ม "แดชบอร์ด" ใช้ URL จาก session เหมือนระบบเกม (ถ้ามี) + fallback ตรวจไฟล์จริง
+   pages/student_test.php — แบบทดสอบก่อนเรียน (Bootstrap 5, PHP/MySQL)
+   - ใช้ requireStudent() เช่นเดียวกับหน้าเกม
+   - ปุ่ม "แดชบอร์ด" ใช้ URL จาก session เหมือนระบบเกม + fallback ตรวจไฟล์จริง
    - รองรับรูปภาพในคำถาม/ตัวเลือก (image_path) โดยตรวจ schema อัตโนมัติ
    - บันทึกผลลงตาราง test_attempts / test_answers
+   - โหมดเดียว: ก่อนเรียน (test_type='pre')
    ====================================================================== */
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
-requireStudent(); // จำกัดเฉพาะนักเรียนที่ล็อกอินแล้วเท่านั้น
+requireStudent(); // จำกัดเฉพาะนักเรียนล็อกอินแล้วเท่านั้น
 
 // ไม่โชว์ error บนหน้า (ให้ไปที่ error log)
 ini_set('display_errors', 0);
@@ -37,6 +37,7 @@ function has_column(mysqli $conn, string $table, string $column): bool {
   $sql = "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ? LIMIT 1";
   $st = $conn->prepare($sql);
+  if (!$st) return false;
   $st->bind_param('ss', $table, $column);
   $st->execute();
   return (bool)$st->get_result()->fetch_row();
@@ -46,6 +47,7 @@ function has_table(mysqli $conn, string $table): bool {
   $sql = "SELECT 1 FROM INFORMATION_SCHEMA.TABLES
           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? LIMIT 1";
   $st = $conn->prepare($sql);
+  if (!$st) return false;
   $st->bind_param('s', $table);
   $st->execute();
   return (bool)$st->get_result()->fetch_row();
@@ -67,8 +69,8 @@ function resolve_student_name(mysqli $conn): string {
         "SELECT CONCAT(first_name,' ',last_name) AS n FROM students WHERE id=?",
         "SELECT name AS n FROM students WHERE id=?",
       ] as $sql) {
-        $st = $conn->prepare($sql); $st->bind_param('i',$uid); $st->execute();
-        $n = $st->get_result()->fetch_assoc()['n'] ?? null; if (!empty($n)) return (string)$n;
+        $st = $conn->prepare($sql); if ($st){ $st->bind_param('i',$uid); $st->execute();
+        $n = $st->get_result()->fetch_assoc()['n'] ?? null; if (!empty($n)) return (string)$n; }
       }
     }
     if (has_table($conn, 'users')) {
@@ -78,8 +80,8 @@ function resolve_student_name(mysqli $conn): string {
         "SELECT name AS n FROM users WHERE id=?",
         "SELECT username AS n FROM users WHERE id=?",
       ] as $sql) {
-        $st = $conn->prepare($sql); $st->bind_param('i',$uid); $st->execute();
-        $n = $st->get_result()->fetch_assoc()['n'] ?? null; if (!empty($n)) return (string)$n;
+        $st = $conn->prepare($sql); if ($st){ $st->bind_param('i',$uid); $st->execute();
+        $n = $st->get_result()->fetch_assoc()['n'] ?? null; if (!empty($n)) return (string)$n; }
       }
     }
   }
@@ -92,24 +94,20 @@ function thai_initial(string $name): string {
 }
 /** หา URL แดชบอร์ด: ยึดค่าจาก session ตามระบบเกม, ถ้าไม่มีให้ fallback เฉพาะไฟล์ที่มีอยู่จริง */
 function pick_dashboard_url(): string {
-  // ใช้ค่าเดียวกับ header ของระบบเกมถ้าเคยตั้งไว้
   if (!empty($_SESSION['student_dashboard_url'])) return (string)$_SESSION['student_dashboard_url'];
   if (!empty($_SESSION['dashboard_url'])) return (string)$_SESSION['dashboard_url'];
-
-  // ตรวจหาไฟล์จริงในโปรเจกต์ (relative จากโฟลเดอร์ /pages)
   $candidates = [
     '../student/dashboard.php',
     '../pages/student_dashboard.php',
     '../dashboard.php',
     '../home.php',
     'dashboard.php',
-    'index.php', // ใช้เฉพาะกรณี index ของ "แดชบอร์ด" จริง ไม่ใช่หน้า login
+    'index.php',
   ];
   foreach ($candidates as $p) {
     $abs = realpath(__DIR__ . '/' . $p);
     if ($abs && is_file($abs)) return $p;
   }
-  // ทางหนีไฟ: กลับหน้าก่อนหน้า (เลี่ยงการชี้ไป login)
   return 'javascript:history.back()';
 }
 
@@ -119,9 +117,8 @@ $studentName  = resolve_student_name($conn);
 $initial      = thai_initial($studentName);
 $dashboardUrl = pick_dashboard_url();
 
-$typeParam = strtolower(trim($_GET['type'] ?? 'pre'));
-$testType  = ($typeParam === 'post') ? 'post' : 'pre';
-$title     = ($testType === 'pre') ? 'แบบทดสอบก่อนเรียน' : 'แบบทดสอบหลังเรียน';
+$TEST_KIND = 'pre';                      // ✅ ใช้โหมดก่อนเรียนอย่างเดียว
+$title     = 'แบบทดสอบก่อนเรียน';
 $QUESTION_COUNT = 30;
 
 $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
@@ -137,7 +134,8 @@ $attempt = null;    // ข้อมูลสรุปผลหลังส่ง
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   // เริ่มเซสชันทดสอบใหม่
-  unset($_SESSION['test_qids'], $_SESSION['test_started_at'], $_SESSION['test_type']);
+  unset($_SESSION['test_qids'], $_SESSION['test_started_at']);
+  $_SESSION['test_type'] = $TEST_KIND;   // เก็บไว้เพื่อความสม่ำเสมอ แม้จะเป็น 'pre' เสมอ
 
   // สุ่ม ID คำถาม
   $stmt = $conn->prepare("SELECT id FROM questions WHERE active=1 ORDER BY RAND() LIMIT ?");
@@ -151,7 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   } else {
     $_SESSION['test_qids']       = $qids;
     $_SESSION['test_started_at'] = time();
-    $_SESSION['test_type']       = $testType;
 
     $inQ   = implode(',', array_fill(0, count($qids), '?'));
     $types = str_repeat('i', count($qids));
@@ -201,10 +198,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   }
   $qids    = $_SESSION['test_qids']       ?? [];
   $started = (int)($_SESSION['test_started_at'] ?? 0);
-  $ttype   = $_SESSION['test_type']       ?? $testType;
 
   if (!$qids || !$started) {
-    header('Location: '.$_SERVER['PHP_SELF'].'?type='.$testType);
+    header('Location: '.$_SERVER['PHP_SELF']); // ✅ ไม่มีพารามิเตอร์ type
     exit;
   }
 
@@ -236,6 +232,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   // บันทึกผลสรุป + คำตอบรายข้อ
   $now      = time();
   $duration = max(1, $now - $started);
+
+  $ttype = 'pre'; // ✅ บังคับก่อนเรียนเสมอ
 
   $stmt = $conn->prepare("INSERT INTO test_attempts
     (user_id, test_type, score, max_score, started_at, submitted_at, duration_seconds)
@@ -349,13 +347,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 <?php elseif ($view === 'result' && $attempt): 
   $percent = $attempt['max_score'] ? round($attempt['score']*100/$attempt['max_score'], 2) : 0.0;
   $badge   = ($percent >= 80) ? 'bg-success' : (($percent >= 50) ? 'bg-warning text-dark' : 'bg-danger');
-  $label   = ($attempt['test_type']==='pre') ? 'ก่อนเรียน' : 'หลังเรียน';
 ?>
   <div class="row g-3">
     <div class="col-lg-8">
       <div class="card shadow-sm question-card">
         <div class="card-body">
-          <h3 class="card-title">สรุปผลแบบทดสอบ (<?= htmlspecialchars($label) ?>)</h3>
+          <h3 class="card-title">สรุปผลแบบทดสอบ (ก่อนเรียน)</h3>
           <p class="mb-1">คะแนน: <span class="badge <?= $badge ?>"><?= (int)$attempt['score'].' / '.(int)$attempt['max_score'] ?> (<?= $percent ?>%)</span></p>
           <p class="mb-1">เวลา: <?= (int)$attempt['duration_seconds'] ?> วินาที</p>
           <p class="text-muted mb-3">เริ่ม: <?= htmlspecialchars($attempt['started_at']) ?> | ส่ง: <?= htmlspecialchars($attempt['submitted_at']) ?></p>
@@ -365,8 +362,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
           </div>
 
           <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>?type=pre">เริ่มก่อนเรียนอีกครั้ง</a>
-            <a class="btn btn-primary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>?type=post">ทำหลังเรียน</a>
+            <a class="btn btn-outline-secondary" href="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">เริ่มทำใหม่</a>
+            <a class="btn btn-primary" href="<?= htmlspecialchars($dashboardUrl) ?>">← กลับแดชบอร์ด</a>
           </div>
         </div>
       </div>
