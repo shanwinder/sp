@@ -652,9 +652,19 @@ function getGameProgress($conn, $user_id, $game_id)
                 if ($game_id == 1) {
 
                     $link = "stage_logic_1.php";
+
+                } else if ($game_id == 2) {
+
+                    $link = "stage_algorithm_1.php";
+
+                } else if ($game_id == 3) {
+
+                    $link = "stage_text_1.php";
+
                 } else {
 
                     $link = "turn_back.html";
+
                 }
 
             ?>
